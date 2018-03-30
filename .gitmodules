@@ -1,0 +1,3 @@
+[submodule "selections/static/css/bootstrap-csh"]
+	path = selections/static/css/bootstrap-csh
+	url = https://github.com/ComputerScienceHouse/bootstrap-csh.git

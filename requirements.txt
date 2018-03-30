@@ -1,0 +1,4 @@
+Flask
+csh_ldap>=2.0.2
+SQLAlchemy
+flask_sqlalchemy
