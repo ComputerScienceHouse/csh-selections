@@ -1,34 +1,12 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Who Is The Primary Owen</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="theme-color" content="#B0197E">
-    <link rel="stylesheet" href="/static/css/bootstrap-csh/release/members-flat.min.css">
-    <link rel="manifest" href="/static/manifest.json">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-    
-</head>
-
-
-{% block nav %}
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-		    hello
-            </div>
-            <ul class="nav navbar-nav">
-            </ul>
-        </div>
-    </nav>
-{% endblock %}
-
-<body>
-   <body>
-      {% block body %}
-      {% endblock %}
-   </body>
+	{% include "include/nav.html" %}
+	<body>
+	<div class ="container theme-showcase" role=main>
+        {% include "include/body.html" %}
+		{% include "include/footer.html" %}
+		{% include "include/scripts.html" %}
+	</div>
+	</body>
 </html>
-
