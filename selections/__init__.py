@@ -27,8 +27,8 @@ app.secret_key = "listen, it's real secret"
 @app.route("/")
 @auth.oidc_auth
 @before_request
-def main():
-    return render_template('index.html')
+def main(info = None):
+    return render_template('index.html' , info = info)
 
 if __name__ =="__main__":
     app.run()
