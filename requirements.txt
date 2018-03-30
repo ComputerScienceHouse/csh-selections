@@ -2,3 +2,8 @@ Flask
 csh_ldap>=2.0.2
 SQLAlchemy
 flask_sqlalchemy
+flask_pyoidc
+requests
+PyMySQL
+pillow
+python-resize-image
