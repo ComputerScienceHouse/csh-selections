@@ -24,4 +24,4 @@ OIDC_CLIENT_CONFIG = {
 }
 
 LDAP_BIND_DN = env.get("LDAP_BIND_DN", default="cn=selections2,ou=Apps,dc=csh,dc=rit,dc=edu")
-LDAP_BIND_PASS = env.get("LDAP_BIND_PW", default=None)
+LDAP_BIND_PASS = env.get("LDAP_BIND_PASS", default=None)
