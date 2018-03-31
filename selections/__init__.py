@@ -28,7 +28,13 @@ app.secret_key = "listen, it's real secret"
 @auth.oidc_auth
 @before_request
 def main(info = None):
-    return render_template('index.html' , info = info)
+    return render_template('index.html' ,info = info)
+
+@app.route("/logout")
+@auth.oidc_logout
+def logout():
+    return redirect("/", 302)
+
 
 if __name__ =="__main__":
     app.run()
