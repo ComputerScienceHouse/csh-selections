@@ -22,8 +22,6 @@ _ldap = csh_ldap.CSHLDAP(app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'
 
 from selections.utils import before_request, get_member_info, process_image
 
-app.secret_key = "listen, it's real secret"
-
 @app.route("/")
 @auth.oidc_auth
 @before_request
