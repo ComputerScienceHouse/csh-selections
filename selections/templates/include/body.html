@@ -4,7 +4,14 @@
 <div id="profile-container" class="container">
 	<div class="card">
 		<div class="card-block card-text">
-		oh boy       
+			{% for teammate in teammates %}
+				{{ teammate.username }}
+			{% endfor %}      
+		</div>
+		<div>
+			{% for person in applications %}
+			{{ person.id }}
+			{% endfor %}
 		</div>
 </div>
 </div>
