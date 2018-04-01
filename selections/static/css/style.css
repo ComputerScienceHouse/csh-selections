@@ -1,9 +1,19 @@
-.card {
+.card { 
 	margin-top: 15px;
 	margin-bottom: 15px;
 	margin-left: auto;
 	margin-right: auto;
 	background-color: #FFF
+}
+
+.applications {
+	background-color: tomato;
+	color: white;
+	padding-top: 30px;
+	padding-right: 30px;
+	padding-bottom: 30px;
+	padding-left: 30px;
+	margin-left:10px;
 }
 
 .img-circle {
@@ -78,3 +88,5 @@ a:active {
 	color: #222;
     	text-decoration: none;
 }
+
+

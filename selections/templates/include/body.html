@@ -6,19 +6,39 @@
 		<div class="card-block card-text">
 		<h3> Teammates:
 			<br>
+			<br>
+
 		<div>
+			<div class="row" >
 			{% for teammate in teammates %}
-			{{teammate.username}} , 	
-			{% endfor %}      
+			<div class = "column" style="float:left; width:25%;">
+				<img src=https://profiles.csh.rit.edu/image/{{teammate.username}} class="img-circle" width="60" height="60" style="display:block; margin-left: auto; margin-right:auto;">
+				<br>
+			<div style="text-align:center">
+				{{teammate.username}}
+			</div>
+			</div>
+			{% endfor %}     
+			</div>	
+	
 		</div>
 		<br>
 		<div>
+			Applications: 
+			<br>
+			<div class = "row">	
 			{% for person in applications %}
+
+
+	<div class="applications column" style="width:auto;">
 			<a href="/application/{{person.id}}">
 			{{ person.id }}
 			</a>
+			</div>
 			<br>
 			{% endfor %}
+			</div>
+		
 		</div>
 		<br>
 		</div>
@@ -36,11 +56,20 @@
 		
 		<div>
 			All Users : <br>
-			{% for user in allUsers %}
-			{{ user.username }}
-			{% endfor %}
-		</div>
-		<br>
+			<div class="row" >
+                        {% for user in allUsers %}
+                        <div class = "column" style="float:left; width:25%;">
+                                <img src=https://profiles.csh.rit.edu/image/{{user.username}} class="img-circle" width="60" height="60" style="display:block; margin-left: auto; margin-right:auto;">
+                                <br>
+                        <div style="text-align:center">
+                                {{user.username}}
+                        </div>
+                        </div>
+                        {% endfor %}     
+                        </div>  
+
+
+	<br>
 		<div>
 			{% for application in allApplications %}
 			{{application.id}}
