@@ -16,24 +16,27 @@
 		<div id = "profile-container" class = "container">
 			<div class = "card">	
 				<div class = "card-block card-text">
+					<form action ="/submit/{{application.id}}/{{info.uid}}" method="post">
 					<h5>
 					<br>
-				Social 
-				{% include "include/rate.html" %}
+				Social
+				<input type="text" class="form-control" placeholder="rating" name="Social"></input>	
 				<br><br>Technical 
-				{% include "include/rate.html" %}
+				<input type="text" class="form-control" placeholder="rating" name="Technical"></input>   
 				<br><br>Creativity
-				{% include "include/rate.html" %}
-				<br><br>Activity_Level
-				{% include "include/rate.html" %}
+				<input type="text" class="form-control" placeholder="rating" name="Creativity"></input>   
+				<br><br>Activity Level
+				<input type="text" class="form-control" placeholder="rating" name="Activity_Level"></input>   
 				<br><br>Versatility
-				{% include "include/rate.html" %}
+				<input type="text" class="form-control" placeholder="rating" name="Versatility"></input>   
 				<br><br>Leadership
-				{% include "include/rate.html" %}
+				<input type="text" class="form-control" placeholder="rating" name="Leadership"></input>   
 				<br><br>Motivation
-				{% include "include/rate.html" %}
-				<br><br>Overall_feeling
-				{% include "include/rate.html" %}
+				<input type="text" class="form-control" placeholder="rating" name="Motivation"></input>   
+				<br><br>Overall Feeling
+				<input type="text" class="form-control" placeholder="rating" name="Overall_Feeling"></input>   
+
+				
 					</h5>
 				</div>
 			</div>
@@ -41,6 +44,7 @@
 	</div>
   </div>
   <div style="text-align:center;" >
-	<button type="button" class="btn" id="submitForm">submit</button>
+	<input type="submit" class="btn btn-primary" value="Submit">
   </div>
+					</form>
 </body>

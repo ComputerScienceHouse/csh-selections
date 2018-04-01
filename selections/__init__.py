@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_pyoidc.flask_pyoidc import OIDCAuthentication
 import os
 from sqlalchemy import ForeignKey
+from flask import request
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -35,7 +36,7 @@ class intro_members(db.Model):
     Application = db.Column(db.String(2000))
     Team = db.Column(db.Integer())
     User_Reviewed = db.Column(db.String(50), ForeignKey("selections_users.username"))
-    def __init__(id, Social, Technical, Creativity, Activity_Level, Versatility, Leadership, Motivation, Overall_Feeling, Application, Team, User_Reviewed):
+    def __init__(self, id, Social, Technical, Creativity, Activity_Level, Versatility, Leadership, Motivation, Overall_Feeling, Application, Team, User_Reviewed):
         self.id = id
         self.Social = Social
         self.Technical = Technical
@@ -52,7 +53,7 @@ class intro_members(db.Model):
 class selections_users(db.Model):
     username = db.Column(db.String(50), primary_key = True)
     team = db.Column(db.Integer()) 
-    def __init__(username, team):
+    def __init__(self, username, team):
         self.username = username
         self.tream = team
 
@@ -95,6 +96,31 @@ def userroute(variable):
 @auth.oidc_logout
 def logout():
     return redirect("/", 302)
+
+@app.route("/submit/<variable>/<variable2>", methods=['POST'])
+@auth.oidc_auth
+def submit(variable, variable2):
+    app = intro_members.query.filter_by(id=variable)[0]
+    Social = request.form.get("Social")
+    Technical = request.form.get("Technical")
+    Creativity = request.form.get("Creativity")
+    Activity_Level = request.form.get("Activity_Level")
+    Versatility = request.form.get("Versatility")
+    Leadership = request.form.get("Leadership")
+    Motivation = request.form.get("Motivation")
+    Overall_Feeling = request.form.get("Overall_Feeling")
+    Application = app.Application
+    Team = app.Team
+    User_Reviewed = selections_users.query.filter_by(username=variable2).first()
+    
+    if(Social != "" and Technical != "" and Creativity != "" and Activity_Level != "" and Versatility != "" and Leadership != "" and Motivation != "" and Overall_Feeling != "" and int(Social) <= 10 and int(Technical) <= 10 and int(Creativity) <= 10 and int(Activity_Level) <= 10 and int(Versatility) <= 10 and int(Leadership) <= 10 and int(Motivation)<= 10 and int(Overall_Feeling)<= 10):
+        member_score = intro_members(id=variable, Social=Social, Technical=Technical, Creativity=Creativity, Activity_Level=Activity_Level, Versatility=Versatility, Leadership=Leadership, Motivation=Motivation, Overall_Feeling=Overall_Feeling, Application=Application, Team=Team, User_Reviewed=variable2)
+        db.session.add(member_score)
+        db.session.flush()
+        db.session.commit()
+    else:
+        return("you didn't fill that out right. try again.")
+    return(variable)
 
 
 if __name__ =="__main__":
