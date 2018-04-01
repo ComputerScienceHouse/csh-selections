@@ -1,0 +1,55 @@
+<body>
+{% include "include/nav.html" %}
+
+<div class="container">
+	<br>
+	<h1>
+	{{ review }}
+	<br>
+	Team : {{ team }}
+	</h1>
+	<div class="card">
+	
+		<div class="card-block card-text">
+			<h3>
+			<br>
+			Members with complete review:
+			</br>
+			</h3>
+	<div class="row">
+                        {% for user in members %}
+			
+			<div class="column" style="float:left; width:25%;">
+                            <img src=https://profiles.csh.rit.edu/image/{{user.User_Reviewed}} class="img-circle"
+                                 width="60" height="60" style="display:block; margin-left: auto; margin-right:auto;">
+                            <br>
+                            <div style="text-align:center">
+                                {{user.User_Reviewed}}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+		</div>
+		<div class = "card-block card-text">
+			<h3>
+				Members on the team:
+			</h3>
+
+		<div class="row">
+                        {% for teammate in teamReviewers %}
+                        <div class="column" style="float:left; width:25%;">
+                            <img src=https://profiles.csh.rit.edu/image/{{teammate.username}} class="img-circle"
+                                 width="60" height="60" style="display:block; margin-left: auto; margin-right:auto;">
+                            <br>
+                            <div style="text-align:center">
+                                {{teammate.username}}
+                            </div>
+                        </div>
+                        {% endfor %}
+			<br>
+                    </div>
+		</div>
+	</div>
+{% include "include/footer.html" %}
+{% include "include/scripts.html" %}
+</body>

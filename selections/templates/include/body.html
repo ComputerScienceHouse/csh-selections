@@ -1,5 +1,6 @@
 <body>
-{% include "include/nav.html" %}
+{%include "include/nav.html" %}
+
 <div class="container">
     <div class="card">
         <div class="card-block card-text">
@@ -24,9 +25,20 @@
                 </div>
                 <br>
                 <div>
+
+
                     Applications:
                     <br>
-                    <br>
+	    <br>
+
+	    </h3>{% with messages = get_flashed_messages() %}
+   {% if messages %}
+      {% for message in messages %}
+         {{ message }}
+      {% endfor %}
+   {% endif %}
+   {% endwith %}<h3>
+
                     <div class="row">
                         {% for person in applications %}
                         <div class="applications column" style="width:auto;">
