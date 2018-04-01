@@ -4,42 +4,52 @@
 <div id="profile-container" class="container">
 	<div class="card">
 		<div class="card-block card-text">
+		<h3> Teammates:
+			<br>
 		<div>
 			{% for teammate in teammates %}
-				{{ teammate.username }}
+			{{teammate.username}} , 	
 			{% endfor %}      
 		</div>
+		<br>
 		<div>
 			{% for person in applications %}
 			<a href="/application/{{person.id}}">
 			{{ person.id }}
 			</a>
+			<br>
 			{% endfor %}
 		</div>
-	</div>
+		<br>
+		</div>
+		</h3>
 	</div>
 </div>
 
+
+		{% if "eboard-evaluations" in info.member_info.group_list %}
 <div id="profile-container" class="container">
         <div class="card">
                 <div class="card-block card-text">
 
-
-		{% if "eboard-evaluations" in info.member_info.group_list %}
-	
+		<h3>
+		
 		<div>
+			All Users : <br>
 			{% for user in allUsers %}
 			{{ user.username }}
 			{% endfor %}
 		</div>
+		<br>
 		<div>
 			{% for application in allApplications %}
 			{{application.id}}
 			{% endfor %}
+		</br>
 		</div>
+</div>
+</div>
 		{% endif %}
-</div>
-</div>
 {% include "include/footer.html" %}
 {% include "include/scripts.html" %}
 </body>

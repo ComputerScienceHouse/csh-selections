@@ -88,11 +88,24 @@ def userroute(variable):
     application = intro_members.query.filter_by(id=variable).all()[0]
     return render_template("vote.html", application = application, info=information)
 
+@app.route("/submit_intro_member", methods=["POST"])
+@auth.oidc_auth
+def submit_intro_member():
+    id = request.form.get("id")
+    member = intro_members(id =id, Social = 0, Technical=0, Creativity=0, Activity_Level = 0, Versatility= 0, Leadership = 0, Motivation = 0, Overall_Feeling = 0, Application = request.form.get("Application"), Team = request.form.get("Team"), User_Reviewed="god")
+    db.session.add(member)
+    db.session.flush()
+    db.session.commit()
+    return(evals())
 
 @app.route("/logout")
 @auth.oidc_logout
 def logout():
     return redirect("/", 302)
+@app.route("/evals")
+@auth.oidc_auth
+def evals():
+    return(render_template("evals.html", info = information))
 
 @app.route("/submit/<variable>/<variable2>", methods=['POST'])
 @auth.oidc_auth

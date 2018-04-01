@@ -1,0 +1,22 @@
+<body>
+{% include "include/nav.html" %}
+
+<div id="profile-container" class="container">
+	<div class="card">
+		<div class="card-block card-text">
+			
+			<form action = "/submit_intro_member" method="post">
+				<input type="text" class="form-control" placeholder="member id" name="id"></input> <br>
+				<input type="text" class="form-control" placeholder="application" name="Application"></input> <br>
+				<input type="text" class="form-control" placeholder="team" name="Team"></input>     
+				<div style = "text-align:center;">
+					<input type="submit" class="btn btn-primary" value="Submit">
+				</div>
+
+
+			</form>
+	</div>
+</div>
+{% include "include/footer.html" %}
+{% include "include/scripts.html" %}
+</body>
