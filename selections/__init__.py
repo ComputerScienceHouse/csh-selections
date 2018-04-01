@@ -65,21 +65,18 @@ information = None
 def main(info = None):
     global information
     information = info
-    
+
     db.create_all()
     user = selections_users.query.filter_by(username=info['uid'])
     if user != None:
+        userTeamNumber = user[0].team
+        userTeam = selections_users.query.filter_by(team=userTeamNumber)
+        userApplications=intro_members.query.filter_by(Team=userTeamNumber)
         if("eboard-evaluations" in info['member_info']['group_list']):
-            userTeamNumber = user[0].team
-            userTeam = selections_users.query.filter_by(team=userTeamNumber)
-            userApplications = intro_members.query.filter_by(Team=userTeamNumber)
             allApplications = intro_members.query.all()
             allUsers = selections_users.query.all()
             return render_template('index.html', info = info, teammates = userTeam, applications=userApplications, allApplications = allApplications, allUsers = allUsers)
 
-        userTeamNumber = (user[0].team)
-        userTeam = selections_users.query.filter_by(team=userTeamNumber)
-        userApplications = intro_members.query.filter_by(Team=userTeamNumber)
         return render_template('index.html', info=info, teammates=userTeam, applications=userApplications)
     else:
         return "you aren't signed up for selections, leave me alone"
@@ -118,12 +115,13 @@ def submit(variable, variable2):
         db.session.add(member_score)
         db.session.flush()
         db.session.commit()
+        return(main())
     else:
         return("you didn't fill that out right. try again.")
-    return(variable)
+    
 
 
 if __name__ =="__main__":
     app.run()
 
-application = app
+application = app   

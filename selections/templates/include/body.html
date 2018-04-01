@@ -4,6 +4,7 @@
 <div id="profile-container" class="container">
 	<div class="card">
 		<div class="card-block card-text">
+		<div>
 			{% for teammate in teammates %}
 				{{ teammate.username }}
 			{% endfor %}      
@@ -14,7 +15,16 @@
 			{{ person.id }}
 			</a>
 			{% endfor %}
-		
+		</div>
+	</div>
+	</div>
+</div>
+
+<div id="profile-container" class="container">
+        <div class="card">
+                <div class="card-block card-text">
+
+
 		{% if "eboard-evaluations" in info.member_info.group_list %}
 	
 		<div>
