@@ -1,107 +1,135 @@
 <body>
 {% include "include/nav.html" %}
-<div id="profile-container" class="container">
-	<div class="card">
-		<div class="card-block card-text">
-		<h3> Teammates:
-			<br>
-			<br>
+<div class="container">
+    <div class="card">
+        <div class="card-block card-text">
+            <h3>
+                Teammates:
+                <br>
+                <br>
+                <div>
+                    <div class="row">
+                        {% for teammate in teammates %}
+                        <div class="column" style="float:left; width:25%;">
+                            <img src=https://profiles.csh.rit.edu/image/{{teammate.username}} class="img-circle"
+                                 width="60" height="60" style="display:block; margin-left: auto; margin-right:auto;">
+                            <br>
+                            <div style="text-align:center">
+                                {{teammate.username}}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
 
-		<div>
-			<div class="row" >
-			{% for teammate in teammates %}
-			<div class = "column" style="float:left; width:25%;">
-				<img src=https://profiles.csh.rit.edu/image/{{teammate.username}} class="img-circle" width="60" height="60" style="display:block; margin-left: auto; margin-right:auto;">
-				<br>
-			<div style="text-align:center">
-				{{teammate.username}}
-			</div>
-			</div>
-			{% endfor %}     
-			</div>	
-	
-		</div>
-		<br>
-		<div>
-			Applications: 
-			<br>
-			<div class = "row">	
-			{% for person in applications %}
+                </div>
+                <br>
+                <div>
+                    Applications:
+                    <br>
+                    <br>
+                    <div class="row">
+                        {% for person in applications %}
+                        <div class="applications column" style="width:auto;">
+                            <a href="/application/{{person.id}}" style="color:white">
+                                {{ person.id }}
+                            </a>
+                        </div>
+                        <br>
+                        {% endfor %}
+                    </div>
 
+                    <script type="text/javascript">
+                        $(window).on('load', (function () {
 
-	<div class="applications column" style="width:auto;">
-			<a href="/application/{{person.id}}" style="color:white">
-			{{ person.id }}
-			</a>
-			</div>
-			<br>
-			{% endfor %}
-			</div>
+                            function get_random_color() {
+                                var letters = '0123456789ABCDEF'.split('');
+                                var color = '#';
+                                for (var i = 0; i < 6; i++) {
+                                    color += letters[Math.round(Math.random() * 12)];
+                                }
+                                return color;
+                            }
 
-<script type="text/javascript">
-$(window).on('load', (function(){
-
-function get_random_color() {
-     var letters = '0123456789ABCDEF'.split('');
-       var color = '#';
-         for (var i = 0; i < 6; i++) {
-		     color += letters[Math.round(Math.random() * 15)];
-		       }
-	   return color;
-}
-
-$(function() {
-    $(".applications").each(function() {
-        $(this).css("background-color", get_random_color());
-    });
-});
-
-
-}));
-</script>
+                            $(function () {
+                                $(".applications").each(function () {
+                                    $(this).css("background-color", get_random_color());
+                                });
+                            });
 
 
-		
-		</div>
-		<br>
-		</div>
-		</h3>
-	</div>
+                        }));
+                    </script>
+                </div>
+            </h3>
+                <br>
+        </div>
+    </div>
 </div>
 
 
-		{% if "eboard-evaluations" in info.member_info.group_list %}
-<div id="profile-container" class="container">
-        <div class="card">
-                <div class="card-block card-text">
+{% if "eboard-evaluations" in info.member_info.group_list %}
+<div class="container">
+    <div class="card">
+        <div class="card-block card-text">
 
-		<h3>
-		
-		<div>
-			All Users : <br>
-			<div class="row" >
+            <h3>
+
+                <div>
+                    All Users : <br>
+                    <div class="row">
                         {% for user in allUsers %}
-                        <div class = "column" style="float:left; width:25%;">
-                                <img src=https://profiles.csh.rit.edu/image/{{user.username}} class="img-circle" width="60" height="60" style="display:block; margin-left: auto; margin-right:auto;">
-                                <br>
-                        <div style="text-align:center">
+                        <div class="column" style="float:left; width:25%;">
+                            <img src=https://profiles.csh.rit.edu/image/{{user.username}} class="img-circle" width="60"
+                                 height="60" style="display:block; margin-left: auto; margin-right:auto;">
+                            <br>
+                            <div style="text-align:center">
                                 {{user.username}}
+                            </div>
                         </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                    <br>
+                    <div>
+                        <div class = "row">
+                        {% for person in allApplications %}
+                        <div class="applications column" style="width:auto;">
+                            <a href="/applicationReview/{{person.id}}" style="color:white">
+                                {{ person.id }}
+                            </a>
                         </div>
-                        {% endfor %}     
-                        </div>  
+                        <br>
+                        {% endfor %}
+                        </div>
+                    </div>
+            </h3>
+                    <script type="text/javascript">
+                        $(window).on('load', (function () {
+
+                            function get_random_color() {
+                                var letters = '0123456789ABCDEF'.split('');
+                                var color = '#';
+                                for (var i = 0; i < 6; i++) {
+                                    color += letters[Math.round(Math.random() * 12)];
+                                }
+                                return color;
+                            }
+
+                            $(function () {
+                                $(".applications").each(function () {
+                                    $(this).css("background-color", get_random_color());
+                                });
+                            });
 
 
-	<br>
-		<div>
-			{% for application in allApplications %}
-			{{application.id}}
-			{% endfor %}
-		</br>
-		</div>
+                        }));
+                    </script>
+                <br>
+            </div>
+    </div>
 </div>
-</div>
-		{% endif %}
+{% endif %}
 {% include "include/footer.html" %}
 {% include "include/scripts.html" %}
 </body>

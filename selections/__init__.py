@@ -107,6 +107,10 @@ def logout():
 def evals():
     return(render_template("evals.html", info = information))
 
+@app.route("/applicationReview/<variable>")
+def applicationReview(variable):
+    return("look at who did their job!")
+
 @app.route("/submit/<variable>/<variable2>", methods=['POST'])
 @auth.oidc_auth
 def submit(variable, variable2):
