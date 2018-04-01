@@ -117,7 +117,7 @@ def evals():
 
 @app.route("/applicationReview/<variable>")
 def applicationReview(variable):
-    items = intro_members.query.filter(intro_members.User_Reviewed != "god")
+    items = intro_members.query.filter_by(id=variable).filter(intro_members.User_Reviewed != "god")
     team = intro_members.query.filter_by(id=variable).first().Team
     teamReviewers = selections_users.query.filter_by(team = team)
     return(render_template("applicationReview.html", info=information, members=items, review=variable, team=team, teamReviewers=teamReviewers))
