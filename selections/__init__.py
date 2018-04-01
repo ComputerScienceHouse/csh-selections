@@ -26,7 +26,10 @@ from selections.utils import before_request, get_member_info, process_image
 @auth.oidc_auth
 @before_request
 def main(info = None):
-    return render_template('index.html' ,info = info)
+    if ("eboard-evaluations" in info['member_info']['group_list']):
+        print('you skyler')
+    return render_template('index.html', info=info)
+    
 
 @app.route("/logout")
 @auth.oidc_logout
