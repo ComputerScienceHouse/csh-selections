@@ -74,7 +74,7 @@ def main(info = None):
     if user != None:
         userTeamNumber = user[0].team
         userTeam = selections_users.query.filter_by(team=userTeamNumber)
-        userApplications=intro_members.query.filter_by(Team=userTeamNumber).filter(intro_members.User_Reviewed!=user[0].username)
+        userApplications=intro_members.query.filter_by(Team=userTeamNumber).filter_by(User_Reviewed="god")
         if("eboard-evaluations" in info['member_info']['group_list']):
             allApplications = intro_members.query.filter_by(User_Reviewed="god")
             allUsers = selections_users.query.all()
