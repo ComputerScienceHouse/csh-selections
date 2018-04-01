@@ -10,9 +10,24 @@
 		</div>
 		<div>
 			{% for person in applications %}
+			<a href="/application/{{person.id}}">
 			{{ person.id }}
+			</a>
+			{% endfor %}
+		
+		{% if "eboard-evaluations" in info.member_info.group_list %}
+	
+		<div>
+			{% for user in allUsers %}
+			{{ user.username }}
 			{% endfor %}
 		</div>
+		<div>
+			{% for application in allApplications %}
+			{{application.id}}
+			{% endfor %}
+		</div>
+		{% endif %}
 </div>
 </div>
 {% include "include/footer.html" %}

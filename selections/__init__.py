@@ -56,16 +56,26 @@ class selections_users(db.Model):
         self.username = username
         self.tream = team
 
+information = None
+
 @app.route("/")
 @auth.oidc_auth
 @before_request
 def main(info = None):
+    global information
+    information = info
+    
     db.create_all()
-    if ("eboard-evaluations" in info['member_info']['group_list']):
-        print('you skyler')
-
     user = selections_users.query.filter_by(username=info['uid'])
     if user != None:
+        if("eboard-evaluations" in info['member_info']['group_list']):
+            userTeamNumber = user[0].team
+            userTeam = selections_users.query.filter_by(team=userTeamNumber)
+            userApplications = intro_members.query.filter_by(Team=userTeamNumber)
+            allApplications = intro_members.query.all()
+            allUsers = selections_users.query.all()
+            return render_template('index.html', info = info, teammates = userTeam, applications=userApplications, allApplications = allApplications, allUsers = allUsers)
+
         userTeamNumber = (user[0].team)
         userTeam = selections_users.query.filter_by(team=userTeamNumber)
         userApplications = intro_members.query.filter_by(Team=userTeamNumber)
@@ -73,6 +83,13 @@ def main(info = None):
     else:
         return "you aren't signed up for selections, leave me alone"
     
+@app.route("/application/<variable>")
+@auth.oidc_auth
+def userroute(variable):
+    global information
+    application = intro_members.query.filter_by(id=variable).all()[0]
+    return render_template("vote.html", application = application, info=information)
+
 
 @app.route("/logout")
 @auth.oidc_logout

@@ -1,0 +1,46 @@
+<body>
+{% include "include/nav.html" %}
+<div class="container">
+  <div class="row">
+    <div class="col-9">
+	<div id="profile-container" class="container">
+        	<div class="card">
+                	<div class="card-block card-text">
+				{{application.id}}
+		   		{{application.Application}}	
+                	</div>
+		</div>
+	</div>
+    </div>
+	<div class="col">
+		<div id = "profile-container" class = "container">
+			<div class = "card">	
+				<div class = "card-block card-text">
+					<h5>
+					<br>
+				Social 
+				{% include "include/rate.html" %}
+				<br><br>Technical 
+				{% include "include/rate.html" %}
+				<br><br>Creativity
+				{% include "include/rate.html" %}
+				<br><br>Activity_Level
+				{% include "include/rate.html" %}
+				<br><br>Versatility
+				{% include "include/rate.html" %}
+				<br><br>Leadership
+				{% include "include/rate.html" %}
+				<br><br>Motivation
+				{% include "include/rate.html" %}
+				<br><br>Overall_feeling
+				{% include "include/rate.html" %}
+					</h5>
+				</div>
+			</div>
+		</div>
+	</div>
+  </div>
+  <div style="text-align:center;" >
+	<button type="button" class="btn" id="submitForm">submit</button>
+  </div>
+</body>
