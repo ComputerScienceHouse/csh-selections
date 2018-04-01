@@ -1,6 +1,5 @@
 <body>
 {% include "include/nav.html" %}
-
 <div id="profile-container" class="container">
 	<div class="card">
 		<div class="card-block card-text">
@@ -31,13 +30,37 @@
 
 
 	<div class="applications column" style="width:auto;">
-			<a href="/application/{{person.id}}">
+			<a href="/application/{{person.id}}" style="color:white">
 			{{ person.id }}
 			</a>
 			</div>
 			<br>
 			{% endfor %}
 			</div>
+
+<script type="text/javascript">
+$(window).on('load', (function(){
+
+function get_random_color() {
+     var letters = '0123456789ABCDEF'.split('');
+       var color = '#';
+         for (var i = 0; i < 6; i++) {
+		     color += letters[Math.round(Math.random() * 15)];
+		       }
+	   return color;
+}
+
+$(function() {
+    $(".applications").each(function() {
+        $(this).css("background-color", get_random_color());
+    });
+});
+
+
+}));
+</script>
+
+
 		
 		</div>
 		<br>
