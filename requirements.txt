@@ -26,6 +26,7 @@ pycparser==2.18
 pycryptodomex==3.5.1
 pyjwkest==1.4.0
 pyldap==3.0.0.post1
+pylint==1.8.3
 PyMySQL==0.8.0
 pyOpenSSL==17.5.0
 python-dateutil==2.7.2
