@@ -1,15 +1,16 @@
-from flask import Flask, render_template, redirect, url_for, flash
-import csh_ldap
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, redirect, url_for, flash, request
+
 from flask_pyoidc.flask_pyoidc import OIDCAuthentication
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 import os
-from sqlalchemy import ForeignKey
-from flask import request
+import csh_ldap
 
+# Create the initial Flask Object
 app = Flask(__name__)
-db = SQLAlchemy(app)
 
-
+# Check if deployed on OpenShift, if so use environment.
 if os.path.exists(os.path.join(os.getcwd(), "config.py")):
     app.config.from_pyfile(os.path.join(os.getcwd(), "config.py"))
 else:
@@ -18,47 +19,16 @@ else:
 auth = OIDCAuthentication(app, issuer=app.config["OIDC_ISSUER"],
                                   client_registration_info=app.config["OIDC_CLIENT_CONFIG"])
 
+# Create a connection to CSH LDAP
 _ldap = csh_ldap.CSHLDAP(app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'])
 
 from selections.utils import before_request, get_member_info, process_image
-db = SQLAlchemy(app)
-app.secret_key = 'some_secret'
 
-class intro_members(db.Model):
-    id = db.Column(db.Integer())
-    Social = db.Column(db.Integer())
-    Technical = db.Column(db.Integer())
-    Creativity = db.Column(db.Integer())
-    Activity_Level = db.Column(db.Integer())
-    Versatility = db.Column(db.Integer())
-    Leadership = db.Column(db.Integer())
-    Motivation = db.Column(db.Integer())
-    Overall_Feeling = db.Column(db.Integer())
-    Application = db.Column(db.String(2000),primary_key = True)
-    Team = db.Column(db.Integer())
-    Gender = db.Column(db.String(10))
-    User_Reviewed = db.Column(db.String(50), ForeignKey("selections_users.username"), primary_key = True)
-    def __init__(self, id, Social, Technical, Creativity, Activity_Level, Versatility, Leadership, Motivation, Overall_Feeling, Gender, Application, Team, User_Reviewed):
-        self.id = id
-        self.Social = Social
-        self.Technical = Technical
-        self.Creativity = Creativity
-        self.Activity_Level = Activity_Level
-        self.Versatility = Versatility
-        self.Leadership = Leadership
-        self.Motivation = Motivation
-        self.Overall_Feeling = Overall_Feeling
-        self.Application = Application
-        self.Team = Team
-        self.User_Reviewed = User_Reviewed
-        self.Gender = Gender
-        
-class selections_users(db.Model):
-    username = db.Column(db.String(50), primary_key = True)
-    team = db.Column(db.Integer()) 
-    def __init__(self, username, team):
-        self.username = username
-        self.tream = team
+# Initalize the SQLAlchemy object and add models.
+# Make sure that you run the migrate task before running.
+db = SQLAlchemy(app)
+from selections.models import *
+migrate = Migrate(app, db)
 
 information = None
 
@@ -69,37 +39,63 @@ def main(info = None):
     global information
     information = info
 
-    db.create_all()
-    user = selections_users.query.filter_by(username=info['uid'])
-    if user != None:
-        userTeamNumber = user[0].team
-        userTeam = selections_users.query.filter_by(team=userTeamNumber)
-        userApplications=intro_members.query.filter_by(Team=userTeamNumber).filter_by(User_Reviewed="god")
+    member = members.query.filter_by(username=info['uid']).first()
+    if member != None:
+        team = members.query.filter_by(team=member.team)
+        reviewed_apps = [a.application for a in submission.query.filter_by(member=info['uid']).all()]
+        applications = [{
+            "id": a.id,
+            "gender": a.gender,
+            "reviewed": a.id in reviewed_apps} for a in applicant.query.filter_by(team=member.team).all()]
+        
         if("eboard-evaluations" in info['member_info']['group_list']):
-            allApplications = intro_members.query.filter_by(User_Reviewed="god")
-            allUsers = selections_users.query.all()
-            return render_template('index.html', info = info, teammates = userTeam, applications=userApplications, allApplications = allApplications, allUsers = allUsers)
+            all_applications = applicant.query.all()
+            all_users = members.query.all()
+            return render_template(
+                'index.html',
+                info = info,
+                teammates = team,
+                applications = applications,
+                reviewed_apps = reviewed_apps,
+                all_applications = all_applications,
+                all_users = all_users)
 
-        return render_template('index.html', info=info, teammates=userTeam, applications=userApplications)
+        return render_template(
+            'index.html',
+            info=info,
+            reviewed_apps = reviewed_apps,
+            teammates=team,
+            applications=applications)
     else:
         return "you aren't signed up for selections, leave me alone"
     
-@app.route("/application/<variable>")
+@app.route("/application/<app_id>")
 @auth.oidc_auth
-def userroute(variable):
+def userroute(app_id):
     global information
-    if intro_members.query.filter_by(id=variable).filter_by(User_Reviewed=information['uid']).first() != None:
-        flash("application already reviewed")
+    reviewed = submission.query.filter_by(id=app_id).filter_by(member=information['uid']).first()
+    if reviewed:
+        flash("You already reviewed that application!")
         return redirect(url_for("main"))
 
-    application = intro_members.query.filter_by(id=variable).all()[0]
-    return render_template("vote.html", application = application, info=information)
+    applicant_info = applicant.query.filter_by(id=app_id).first()
+    fields = criteria.query.filter_by(medium="Paper").all()
+    return render_template(
+        "vote.html",
+        application = applicant_info,
+        info=information,
+        fields = fields)
 
 @app.route("/submit_intro_member", methods=["POST"])
 @auth.oidc_auth
 def submit_intro_member():
     id = request.form.get("id")
-    member = intro_members(id =id, Social = 0, Technical=0, Creativity=0, Activity_Level = 0, Versatility= 0, Leadership = 0, Motivation = 0, Overall_Feeling = 0, Application = request.form.get("Application"), Team = request.form.get("Team"), User_Reviewed="god", Gender=request.form.get("Gender"))
+    print(request.form)
+    member = applicant(
+        id = id,
+        body = request.form.get("application"),
+        team = request.form.get("team"),
+        gender = request.form.get("gender"))
     db.session.add(member)
     db.session.flush()
     db.session.commit()
@@ -115,38 +111,43 @@ def logout():
 def evals():
     return(render_template("evals.html", info = information))
 
-@app.route("/applicationReview/<variable>")
-def applicationReview(variable):
-    items = intro_members.query.filter_by(id=variable).filter(intro_members.User_Reviewed != "god")
-    team = intro_members.query.filter_by(id=variable).first().Team
+@app.route("/applicationReview/<app_id>")
+def application_review(app_id):
+    items = intro_members.query.filter_by(id=app_id).filter(intro_members.User_Reviewed != "god")
+    team = intro_members.query.filter_by(id=app_id).first().Team
     teamReviewers = selections_users.query.filter_by(team = team)
-    return(render_template("applicationReview.html", info=information, members=items, review=variable, team=team, teamReviewers=teamReviewers))
+    return(render_template("applicationReview.html", info=information, members=items, review=app_id, team=team, teamReviewers=teamReviewers))
 
-@app.route("/submit/<variable>/<variable2>", methods=['POST'])
+@app.route("/submit/<app_id>", methods=['POST'])
 @auth.oidc_auth
-def submit(variable, variable2):
-    app = intro_members.query.filter_by(id=variable)[0]
-    Social = request.form.get("Social")
-    Technical = request.form.get("Technical")
-    Creativity = request.form.get("Creativity")
-    Activity_Level = request.form.get("Activity_Level")
-    Versatility = request.form.get("Versatility")
-    Leadership = request.form.get("Leadership")
-    Motivation = request.form.get("Motivation")
-    Overall_Feeling = request.form.get("Overall_Feeling")
-    Application = app.Application
-    Team = app.Team
-    Gender = app.Gender
-    User_Reviewed = selections_users.query.filter_by(username=variable2).first()
+def submit(app_id):
+    global information
+    print(request.form)
+    fields = [{
+        "value": request.form.get(crit.name),
+        "weight": crit.weight,
+        "max": crit.max_score,
+        "min": crit.min_score} for crit in criteria.query.filter_by(medium="Paper").all()]
+    print(fields)
+    applicant_info = applicant.query.filter_by(id=app_id).first()
+    member = members.query.filter_by(username=information['uid']).first()
+
+    if applicant_info.team != member.team:
+        return("You are not allowed to review this application!")
     
-    if(Social != "" and Technical != "" and Creativity != "" and Activity_Level != "" and Versatility != "" and Leadership != "" and Motivation != "" and Overall_Feeling != "" and int(Social) <= 10 and int(Technical) <= 10 and int(Creativity) <= 10 and int(Activity_Level) <= 10 and int(Versatility) <= 10 and int(Leadership) <= 10 and int(Motivation)<= 10 and int(Overall_Feeling)<= 10):
-        member_score = intro_members(id=variable, Social=Social, Technical=Technical, Creativity=Creativity, Activity_Level=Activity_Level, Versatility=Versatility, Leadership=Leadership, Motivation=Motivation, Overall_Feeling=Overall_Feeling,Gender=Gender, Application=Application, Team=Team, User_Reviewed=variable2)
-        db.session.add(member_score)
-        db.session.flush()
-        db.session.commit()
-        return(main())
-    else:
-        return("you didn't fill that out right. try again.")
+    for field in fields:
+        if not field["min"] <= int(field["value"]) <= field["max"]:
+            return("Please fill out the form correctly!")
+
+    total_score = 0
+    for field in fields:
+        total_score += (int(field["value"]) * field["weight"])
+
+    member_score = submission(application=app_id, member=member.username, medium="Paper", score=total_score)
+    db.session.add(member_score)
+    db.session.flush()
+    db.session.commit()
+    return(main())
     
 
 

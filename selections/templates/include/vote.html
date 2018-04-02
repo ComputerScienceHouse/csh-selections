@@ -1,57 +1,50 @@
 <body>
-{% include "include/nav.html" %}
-<div class="container">
-  <div class="row">
-    <div class="col-9">
-	<div id="profile-container" class="container">
-        	<div class="card">
-                	<div class="card-block card-text">
-				<h1>
-				{{application.id}}
-				</h1>
-				{{application.Gender}}
-				<br>
-				<br>
-		   		{{application.Application}}
-                		<br>
-				<br>
+	{% include "include/nav.html" %}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<div id="profile-container" class="container">
+					<div class="card">
+						<div class="card-body">
+							<h3 class="card-title">Application {{application.id}}</h3>
+							<h6 class="card-subtitle mb-2 text-muted">Gender: {{application.gender}}</h6>
+							<p class="card-text">{{application.body}}</p>
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
-	</div>
-    </div>
-	<div class="col">
-		<div id = "profile-container" class = "container">
-			<div class = "card">	
-				<div class = "card-block card-text">
-					<form action ="/submit/{{application.id}}/{{info.uid}}" method="post">
-					<h5>
-					<br>
-				Social
-				<input type="text" class="form-control" placeholder="rating" name="Social"></input>	
-				<br><br>Technical 
-				<input type="text" class="form-control" placeholder="rating" name="Technical"></input>   
-				<br><br>Creativity
-				<input type="text" class="form-control" placeholder="rating" name="Creativity"></input>   
-				<br><br>Activity Level
-				<input type="text" class="form-control" placeholder="rating" name="Activity_Level"></input>   
-				<br><br>Versatility
-				<input type="text" class="form-control" placeholder="rating" name="Versatility"></input>   
-				<br><br>Leadership
-				<input type="text" class="form-control" placeholder="rating" name="Leadership"></input>   
-				<br><br>Motivation
-				<input type="text" class="form-control" placeholder="rating" name="Motivation"></input>   
-				<br><br>Overall Feeling
-				<input type="text" class="form-control" placeholder="rating" name="Overall_Feeling"></input>   
-
-				
-					</h5>
+			<div class="col-md-4">
+				<div id="profile-container" class="container">
+					<div class="card">	
+						<div class="card-body">
+							<h3 class="card-title">Rubric</h3>
+							<form action ="/submit/{{application.id}}" method="post" id="application-rubric">
+								<table class="table table-striped">
+									<thead>
+										<tr>
+											<th scope="col">Criteria</th>
+											<th scope="col">Range</th>
+											<th scope="col">Weight</th>
+											<th scope="col">Score</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for criteria in fields %}
+										<tr>
+											<th scope="row">{{criteria.name}}</th>
+											<td>{{criteria.min_score}} - {{criteria.max_score}}</td>
+											<td>{{criteria.weight}}</td>
+											<td style="padding-top:7px;"><input value="{{criteria.min_score}}" min="{{criteria.min_score}}" max="{{criteria.max_score}}" type="number" name="{{criteria.name}}" id="{{criteria.name}}" class="form-control form-control-sm" style="font-size: 13px;" form="application-rubric" required></td>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+								<input type="submit" class="btn btn-primary" value="Submit" form="application-rubric">
+							</form>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-  </div>
-  <div style="text-align:center;" >
-	<input type="submit" class="btn btn-primary" value="Submit">
-  </div>
-					</form>
 </body>
