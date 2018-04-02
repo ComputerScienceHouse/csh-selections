@@ -39,10 +39,16 @@ from selections.blueprints.application import *
 @auth.oidc_auth
 @before_request
 def main(info=None):
+    all_applications = []
+    all_users = []
+    averages = []
+    reviewers = []
+
     is_evals = "eboard-evaluations" in info['member_info']['group_list']
+    is_rtp = "rtp" in info['member_info']['group_list']
     member = members.query.filter_by(username=info['uid']).first()
 
-    if is_evals:
+    if is_evals or is_rtp:
         all_applications = applicant.query.all()
         all_users = members.query.all()
 
@@ -81,7 +87,7 @@ def main(info=None):
             averages=averages,
             reviewers=reviewers)
 
-    elif is_evals:
+    elif is_evals or is_rtp:
         return render_template(
             'index.html',
             info=info,
