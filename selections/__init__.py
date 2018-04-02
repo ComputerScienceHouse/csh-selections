@@ -133,7 +133,7 @@ def logout():
 @before_request
 def evals(info=None):
     is_evals = "eboard-evaluations" in info['member_info']['group_list']
-    is_evals = "rtp" in info['member_info']['group_list']
+    is_rtp = "rtp" in info['member_info']['group_list']
     if is_evals or is_rtp:
         return(render_template("evals.html", info=info))
     else:
@@ -154,6 +154,11 @@ def submit(app_id, info=None):
     print(fields)
     applicant_info = applicant.query.filter_by(id=app_id).first()
     member = members.query.filter_by(username=info['uid']).first()
+    submissions = [sub.member for sub in submission.query.filter_by(application=app_id).all()]
+
+    if info['uid'] in submissions:
+        flash("You have already reviewed this application!")
+        return redirect(url_for("main"))
 
     if applicant_info.team != member.team:
         flash("You are not on the correct team to review that application!")
@@ -174,6 +179,27 @@ def submit(app_id, info=None):
     db.session.commit()
     flash("Thanks for evaluating application #{}!".format(app_id))
     return(main())
+
+
+@app.route("/application/review/<app_id>", methods=['GET'])
+@auth.oidc_auth
+@before_request
+def review_application(app_id, info=None):
+    is_evals = "eboard-evaluations" in info['member_info']['group_list']
+    is_rtp = "rtp" in info['member_info']['group_list']
+    if is_evals or is_rtp:
+        applicant_info = applicant.query.filter_by(id=app_id).first()
+        scores = submission.query.filter_by(application=app_id).all()
+        split_body = applicant_info.body.split("\n")
+        return render_template(
+            'review_app.html',
+            info=info,
+            application = applicant_info,
+            scores = scores,
+            split_body = split_body)
+    else:
+        flash("You aren't allowed to see that page!")
+        return redirect(url_for("main"))
     
 
 

@@ -15,3 +15,8 @@ body {
 a:hover {
     text-decoration: none;
 }
+
+#results-table_wrapper {
+    padding-right: 0;
+    padding-left: 0;
+}

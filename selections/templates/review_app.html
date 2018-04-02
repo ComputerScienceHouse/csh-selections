@@ -1,0 +1,22 @@
+{% include "include/head.html" %}
+<div class="container">
+	<div class="card">
+		<div class="card-body">
+			<h3 class="card-title">Application {{application.id}}</h3>
+			<h6 class="card-subtitle mb-2 text-muted">Gender: {{application.gender}}</h6>
+			{% for paragraph in split_body %}
+			<p class="card-text">{{paragraph}}</p>
+			{% endfor %}
+		</div>
+	</div>
+	{% for score in scores %}
+	<div class="card">
+		<div class="card-body">
+			<h3 class="card-title">{{score.member}}</h3>
+			<h6 class="card-subtitle mb-2 text-muted">Score: {{score.score}}</h6>
+		</div>
+	</div>
+	{% endfor %}
+</div>
+{% include "include/footer.html" %}
+

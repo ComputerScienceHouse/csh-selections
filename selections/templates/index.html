@@ -45,7 +45,7 @@
 					{% for person in applications %}
 					{% if not person.reviewed %}
 					<tr>
-						<th scope="row">
+						<th>
 							<a href="/application/{{ person.id }}">
 								<i class="fas fa-clipboard-list"></i> {{ person.id }}
 							</a>
@@ -77,8 +77,8 @@
 				<tbody>
 					{% for application in all_applications %}
 					<tr>
-
-						<td><strong>{{ application.id }}</strong></td>
+						<th>
+						<a href="/application/review/{{ application.id }}"><i class="fas fa-clipboard-check"></i> {{ application.id }}</a></th>
 						<td>{{ application.gender }}</td>
 						<td>
 							{% for member in reviewers[application.id] %}
