@@ -1,19 +1,19 @@
 {% include "include/head.html" %}
 <div class="container">
 	<div class="card">
-		<div class="card-block card-text">
-			
+		<div class="card-body">
+			<h3 class="card-title">Add Application</h3>
 			<form action = "/submit_intro_member" method="post" id="evals-create-application">
 				<input type="text" class="form-control" placeholder="Application ID" name="id"></input> <br>
-				<input type="text" class="form-control" placeholder="Application Text" name="application"></input> <br>
+				<textarea class="form-control" placeholder="Application Text" name="application" rows="10"></textarea> <br>
 				<input type="text" class="form-control" placeholder="Team" name="team"></input>
-				<select class="custom-select" name="gender" form="evals-create-application">
+				<select class="custom-select" name="gender" form="evals-create-application" style="margin-top:20px">
 				  <option value="" selected disabled hidden>Gender</option>
 				  <option value="Male">Male</option>
 				  <option value="Female">Female</option>
 				  <option value="Other">Other</option>
 				</select>
-				<div style = "text-align:center;">
+				<div style = "text-align:center; padding-top: 30px;">
 					<input type="submit" class="btn btn-primary" value="Submit">
 				</div>
 
