@@ -1,86 +1,17 @@
 .card { 
-	margin-top: 15px;
-	margin-bottom: 15px;
-	margin-left: auto;
-	margin-right: auto;
+	margin-bottom: 20px;
 	background-color: #FFF
-}
-
-.applications {
-	
-	color: white;
-	padding-top: 30px;
-	padding-right: 30px;
-	padding-bottom: 30px;
-	padding-left: 30px;
-	margin-left:10px;
 }
 
 .img-circle {
 	border-radius: 50%;
 }
 
-.profile-img {
-	height: 250px;
-	width: 250px;
-}
-
-.card-img-top-crop {
-  	width: 15rem;
-  	height: 200px;
-  	background-position: center center;
-  	background-repeat: no-repeat;
-  	overflow: hidden;
-}
-
-.user-card {
-	width: 15rem;
-}
-
-.active {
-	color: #ccc;
-}
-
-.card-profile-pic {
-	margin:auto; 
-	-webkit-background-size: cover;
-	-moz-background-size: cover;
-	-o-background-size: cover;
-	background-size: cover;
-}
-
-#groups {
-	padding-top: .9rem;
-	padding-bottom: 0;
-}
-
 body {
 	background-color: #eee;
-}
-
-a {
-	color: #222;
-	text-decoration: none;
-}
-
-a:link {
-	color: #222;
-    	text-decoration: none;
-}
-
-a:visited {
-	color: #222;
-    	text-decoration: none;
+	padding-top: 80px;
 }
 
 a:hover {
-	color: #222;
-    	text-decoration: none;
+    text-decoration: none;
 }
-
-a:active {
-	color: #222;
-    	text-decoration: none;
-}
-
-
