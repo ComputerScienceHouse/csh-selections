@@ -30,15 +30,10 @@ db = SQLAlchemy(app)
 from selections.models import *
 migrate = Migrate(app, db)
 
-information = None
-
 @app.route("/")
 @auth.oidc_auth
 @before_request
 def main(info = None):
-    global information
-    information = info
-
     member = members.query.filter_by(username=info['uid']).first()
     if member != None:
         team = members.query.filter_by(team=member.team)
@@ -71,9 +66,9 @@ def main(info = None):
     
 @app.route("/application/<app_id>")
 @auth.oidc_auth
-def userroute(app_id):
-    global information
-    reviewed = submission.query.filter_by(id=app_id).filter_by(member=information['uid']).first()
+@before_request
+def userroute(app_id, info=None):
+    reviewed = submission.query.filter_by(id=app_id).filter_by(member=info['uid']).first()
     if reviewed:
         flash("You already reviewed that application!")
         return redirect(url_for("main"))
@@ -83,12 +78,13 @@ def userroute(app_id):
     return render_template(
         "vote.html",
         application = applicant_info,
-        info=information,
+        info=info,
         fields = fields)
 
 @app.route("/submit_intro_member", methods=["POST"])
 @auth.oidc_auth
-def submit_intro_member():
+@before_request
+def submit_intro_member(info=None):
     id = request.form.get("id")
     print(request.form)
     member = applicant(
@@ -108,20 +104,23 @@ def logout():
 
 @app.route("/evals")
 @auth.oidc_auth
-def evals():
-    return(render_template("evals.html", info = information))
+@before_request
+def evals(info=None):
+    return(render_template("evals.html", info=info))
 
 @app.route("/applicationReview/<app_id>")
-def application_review(app_id):
+@auth.oidc_auth
+@before_request
+def application_review(app_id, info=None):
     items = intro_members.query.filter_by(id=app_id).filter(intro_members.User_Reviewed != "god")
     team = intro_members.query.filter_by(id=app_id).first().Team
     teamReviewers = selections_users.query.filter_by(team = team)
-    return(render_template("applicationReview.html", info=information, members=items, review=app_id, team=team, teamReviewers=teamReviewers))
+    return(render_template("applicationReview.html", info=info, members=items, review=app_id, team=team, teamReviewers=teamReviewers))
 
 @app.route("/submit/<app_id>", methods=['POST'])
 @auth.oidc_auth
-def submit(app_id):
-    global information
+@before_request
+def submit(app_id, info=None):
     print(request.form)
     fields = [{
         "value": request.form.get(crit.name),
@@ -130,7 +129,7 @@ def submit(app_id):
         "min": crit.min_score} for crit in criteria.query.filter_by(medium="Paper").all()]
     print(fields)
     applicant_info = applicant.query.filter_by(id=app_id).first()
-    member = members.query.filter_by(username=information['uid']).first()
+    member = members.query.filter_by(username=info['uid']).first()
 
     if applicant_info.team != member.team:
         return("You are not allowed to review this application!")
