@@ -1,32 +1,31 @@
-
-    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-<div class="container">
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+    <div class="container">
         <a class="navbar-brand" href="/">Selections</a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
         aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
-    </button>
+        </button>
 
-    <div class="collapse navbar-collapse" id="navbarColor01">
-        <ul class="navbar-nav mr-auto">
-            {% if "eboard-evaluations" in info.member_info.group_list or "rtp" in info.member_info.group_list %}
-            <li>               
-              <a class="nav-link" href="/application/create"><i class="fas fa-plus"></i> Create Application</a>
-          </li>
-          {% endif %}
+      <div class="collapse navbar-collapse" id="navbarColor01">
+          <ul class="navbar-nav mr-auto">
+              {% if "eboard-evaluations" in info.member_info.group_list or "rtp" in info.member_info.group_list %}
+              <li>               
+                  <a class="nav-link" href="/application/create"><i class="fas fa-plus"></i> Create Application</a>
+              </li>
+              {% endif %}
 
-      </ul>
-      <ul class="nav navbar-nav ml-auto">
+          </ul>
+          <ul class="nav navbar-nav ml-auto">
 
-        <span class="nav-item fa fa-cog fa-spin" style="font-size:24px; color:#fff;display:none" id="load-icon"></span>
+              <span class="nav-item fa fa-cog fa-spin" style="font-size:24px; color:#fff;display:none" id="load-icon"></span>
 
-        <div class="nav-item navbar-user text-white">
-            <img src="https://profiles.csh.rit.edu/image/{{ info.uid }}">
-			{{ info.uid }}
-        </div>
-    </ul>
-</div>
-</div>
+              <div class="nav-item navbar-user text-white">
+                  <img src="https://profiles.csh.rit.edu/image/{{ info.uid }}">
+                  {{ info.uid }}
+              </div>
+          </ul>
+      </div>
+  </div>
 </nav>
 

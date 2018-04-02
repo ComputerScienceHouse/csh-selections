@@ -1,98 +1,101 @@
-{% include "include/head.html" %}
-<div class="container">
+{% extends 'base.html' %}
+{% block body %}
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-	{% with messages = get_flashed_messages() %}
-		{% if messages %}
-			{% for message in messages %}
-				<div class="alert alert-info" role="alert">{{ message }}</div>
-			{% endfor %}
-		{% endif %}
-	{% endwith %}
+        {% if teammates %}
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Selections Group</h4>
+                    <div class="row">
+                        {% for teammate in teammates %}
+                            <div class="col-6 col-sm-3 col-md-3">
+                                <img src=https://profiles.csh.rit.edu/image/{{ teammate.username }} class="img-circle"
+                                     width="60" height="60" style="display:block; margin: 20px auto 0;">
+                                <div style="text-align:center">
+                                    {{ teammate.username }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">You aren't assigned a selections group.</div>
+        {% endif %}
 
-	{% if teammates %}
-	<div class="card">
-		<div class="card-body">
-			<h4 class="card-title">Selections Group</h4>
-			<div class="row">
-				{% for teammate in teammates %}
-				<div class="col-6 col-sm-3 col-md-3">
-					<img src=https://profiles.csh.rit.edu/image/{{teammate.username}} class="img-circle"
-					width="60" height="60" style="display:block; margin: 20px auto 0;">
-					<div style="text-align:center">
-						{{teammate.username}}
-					</div>
-				</div>
-				{% endfor %}
-			</div>
-		</div>
-	</div>
-	{% else %}
-	<div class="alert alert-info" role="alert">You aren't assigned a selections group.</div>
-	{% endif %}
+        {% if applications %}
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Pending Applications</h4>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Gender</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for person in applications %}
+                            {% if not person.reviewed %}
+                                <tr>
+                                    <th>
+                                        <a href="/application/{{ person.id }}">
+                                            <i class="fas fa-clipboard-list"></i> {{ person.id }}
+                                        </a>
+                                    </th>
+                                    <td>{{ person.gender }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
-	{% if applications %}
-	<div class="card">
-		<div class="card-body">
-			<h4 class="card-title">Pending Applications</h4>
-			<table class="table">
-				<thead>
-					<tr>
-						<th scope="col">ID</th>
-						<th scope="col">Gender</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for person in applications %}
-					{% if not person.reviewed %}
-					<tr>
-						<th>
-							<a href="/application/{{ person.id }}">
-								<i class="fas fa-clipboard-list"></i> {{ person.id }}
-							</a>
-						</th>
-						<td>{{ person.gender }}</td>
-					</tr>
-					{% endif %}
-					{% endfor %}
-				</tbody>
-			</table>
+                </div>
+            </div>
+        {% endif %}
 
-		</div>
-	</div>
-	{% endif %}
-
-	{% if "eboard-evaluations" in info.member_info.group_list or "rtp" in info.member_info.group_list %}
-	<div class="card">
-		<div class="card-body">
-			<h4 class="card-title">All Applications</h4>
-			<table class="table" style="width:100%" id="results-table">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Gender</th>
-						<th>Reviewers</th>
-						<th>Score</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for application in all_applications %}
-					<tr>
-						<th>
-						<a href="/application/review/{{ application.id }}"><i class="fas fa-clipboard-check"></i> {{ application.id }}</a></th>
-						<td>{{ application.gender }}</td>
-						<td>
-							{% for member in reviewers[application.id] %}
-							<img width="25" height="25" class="img-circle" src="https://profiles.csh.rit.edu/image/{{ member }}" data-toggle="tooltip" data-placement="top" title="{{ member }}">
-							{% endfor %}
-						</td>
-						<td>{{ averages[application.id] }}</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	</div>
-	{% endif %}
-
-{% include "include/footer.html" %}
+        {% if "eboard-evaluations" in info.member_info.group_list or "rtp" in info.member_info.group_list %}
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">All Applications</h4>
+                    <table class="table" style="width:100%" id="results-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Gender</th>
+                            <th>Reviewers</th>
+                            <th>Score</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for application in all_applications %}
+                            <tr>
+                                <th>
+                                    <a href="/application/review/{{ application.id }}"><i
+                                            class="fas fa-clipboard-check"></i> {{ application.id }}</a></th>
+                                <td>{{ application.gender }}</td>
+                                <td>
+                                    {% for member in reviewers[application.id] %}
+                                        <img width="25" height="25" class="img-circle"
+                                             src="https://profiles.csh.rit.edu/image/{{ member }}" data-toggle="tooltip"
+                                             data-placement="top" title="{{ member }}">
+                                    {% endfor %}
+                                </td>
+                                <td>{{ averages[application.id] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
 
