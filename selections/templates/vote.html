@@ -1,50 +1,58 @@
-{% include "include/head.html" %}
-<div class="container">
-	<div class="row">
-		<div class="col-md-12 col-lg-7 col-xl-8">
+{% extends 'base.html' %}
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-lg-7 col-xl-8">
 
-			<div class="card">
-				<div class="card-body">
-					<h3 class="card-title">Application {{application.id}}</h3>
-					<h6 class="card-subtitle mb-2 text-muted">Gender: {{application.gender}}</h6>
-					{% for paragraph in split_body %}
-					<p class="card-text">{{paragraph}}</p>
-					{% endfor %}
-				</div>
-			</div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Application {{ application.id }}</h3>
+                        <h6 class="card-subtitle mb-2 text-muted">Gender: {{ application.gender }}</h6>
+                        {% for paragraph in split_body %}
+                            <p class="card-text">{{ paragraph }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
 
-		</div>
-		<div class="col-md-12 col-lg-5 col-xl-4">
-			<div class="card">	
-				<div class="card-body">
-					<h3 class="card-title">Rubric</h3>
-					<form action ="/application/{{application.id}}" method="post" id="application-rubric">
-						<table class="table table-striped">
-							<thead>
-								<tr>
-									<th scope="col">Criteria</th>
-									<th scope="col">Range</th>
-									<th scope="col">Weight</th>
-									<th scope="col">Score</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for criteria in fields %}
-								<tr>
-									<th scope="row">{{criteria.name}}</th>
-									<td>{{criteria.min_score}} - {{criteria.max_score}}</td>
-									<td>{{criteria.weight}}</td>
-									<td style="padding-top:7px;"><input value="{{criteria.min_score}}" min="{{criteria.min_score}}" max="{{criteria.max_score}}" type="number" name="{{criteria.name}}" id="{{criteria.name}}" class="form-control form-control-sm" style="font-size: 13px;" form="application-rubric" required></td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-						<input type="submit" class="btn btn-primary" value="Submit" form="application-rubric">
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-{% include "include/footer.html" %}
+            </div>
+            <div class="col-md-12 col-lg-5 col-xl-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Rubric</h3>
+                        <form action="/application/{{ application.id }}" method="post" id="application-rubric">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Criteria</th>
+                                    <th scope="col">Range</th>
+                                    <th scope="col">Weight</th>
+                                    <th scope="col">Score</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for criteria in fields %}
+                                    <tr>
+                                        <th scope="row">{{ criteria.name }}</th>
+                                        <td>{{ criteria.min_score }} - {{ criteria.max_score }}</td>
+                                        <td>{{ criteria.weight }}</td>
+                                        <td style="padding-top:7px;"><input value="{{ criteria.min_score }}"
+                                                                            min="{{ criteria.min_score }}"
+                                                                            max="{{ criteria.max_score }}" type="number"
+                                                                            name="{{ criteria.name }}"
+                                                                            id="{{ criteria.name }}"
+                                                                            class="form-control form-control-sm"
+                                                                            style="font-size: 13px;"
+                                                                            form="application-rubric" required></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <input type="submit" class="btn btn-primary" value="Submit" form="application-rubric">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
 

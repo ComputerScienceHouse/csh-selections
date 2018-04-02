@@ -3,6 +3,7 @@ from selections.utils import before_request
 from selections import app, auth
 from selections.models import *
 
+
 @app.route("/application/<app_id>")
 @auth.oidc_auth
 @before_request
@@ -17,10 +18,10 @@ def get_application(app_id, info=None):
     fields = criteria.query.filter_by(medium="Paper").all()
     return render_template(
         "vote.html",
-        application = applicant_info,
-        split_body = split_body,
+        application=applicant_info,
+        split_body=split_body,
         info=info,
-        fields = fields)
+        fields=fields)
 
 
 @app.route("/application", methods=["POST"])
@@ -29,14 +30,14 @@ def get_application(app_id, info=None):
 def create_application(info=None):
     id = request.form.get("id")
     member = applicant(
-        id = id,
-        body = request.form.get("application"),
-        team = request.form.get("team"),
-        gender = request.form.get("gender"))
+        id=id,
+        body=request.form.get("application"),
+        team=request.form.get("team"),
+        gender=request.form.get("gender"))
     db.session.add(member)
     db.session.flush()
     db.session.commit()
-    return(get_application_creation())
+    return get_application_creation()
 
 
 @app.route("/application/delete/<app_id>", methods=["GET"])
@@ -57,6 +58,7 @@ def delete_application(app_id, info=None):
         db.session.commit()
         return redirect("/", 302)
 
+
 @app.route("/application/create")
 @auth.oidc_auth
 @before_request
@@ -64,10 +66,11 @@ def get_application_creation(info=None):
     is_evals = "eboard-evaluations" in info['member_info']['group_list']
     is_rtp = "rtp" in info['member_info']['group_list']
     if is_evals or is_rtp:
-        return(render_template("admin.html", info=info))
+        return render_template("admin.html", info=info)
     else:
         flash("You aren't allowed to see that page!")
         return redirect(url_for("main"))
+
 
 @app.route("/logout")
 @auth.oidc_logout
@@ -97,7 +100,7 @@ def submit_application(app_id, info=None):
     if applicant_info.team != member.team:
         flash("You are not on the correct team to review that application!")
         return redirect(url_for("main"))
-    
+
     for field in fields:
         if not field["min"] <= int(field["value"]) <= field["max"]:
             flash("Please make sure that the data you submitted is valid!")
@@ -128,9 +131,9 @@ def review_application(app_id, info=None):
         return render_template(
             'review_app.html',
             info=info,
-            application = applicant_info,
-            scores = scores,
-            split_body = split_body)
+            application=applicant_info,
+            scores=scores,
+            split_body=split_body)
     else:
         flash("You aren't allowed to see that page!")
         return redirect(url_for("main"))

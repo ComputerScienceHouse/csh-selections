@@ -1,13 +1,11 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
-
-from flask_pyoidc.flask_pyoidc import OIDCAuthentication
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-
+import os
 from collections import defaultdict
 
-import os
 import csh_ldap
+from flask import Flask
+from flask_migrate import Migrate
+from flask_pyoidc.flask_pyoidc import OIDCAuthentication
+from flask_sqlalchemy import SQLAlchemy
 
 # Create the initial Flask Object
 app = Flask(__name__)
@@ -19,7 +17,7 @@ else:
     app.config.from_pyfile(os.path.join(os.getcwd(), "config.env.py"))
 
 auth = OIDCAuthentication(app, issuer=app.config["OIDC_ISSUER"],
-                                  client_registration_info=app.config["OIDC_CLIENT_CONFIG"])
+                          client_registration_info=app.config["OIDC_CLIENT_CONFIG"])
 
 # Create a connection to CSH LDAP
 _ldap = csh_ldap.CSHLDAP(app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'])
@@ -30,17 +28,18 @@ from selections.utils import before_request, get_member_info, process_image
 # Make sure that you run the migrate task before running.
 db = SQLAlchemy(app)
 from selections.models import *
+
 migrate = Migrate(app, db)
 
 # Load Applications Blueprint
 from selections.blueprints.application import *
 
+
 @app.route("/")
 @auth.oidc_auth
 @before_request
-def main(info = None):
+def main(info=None):
     is_evals = "eboard-evaluations" in info['member_info']['group_list']
-    is_evals = True
     member = members.query.filter_by(username=info['uid']).first()
 
     if is_evals:
@@ -70,29 +69,29 @@ def main(info = None):
             "id": a.id,
             "gender": a.gender,
             "reviewed": a.id in reviewed_apps} for a in applicant.query.filter_by(team=member.team).all()]
-        
+
         return render_template(
             'index.html',
-            info = info,
-            teammates = team,
-            applications = applications,
-            reviewed_apps = reviewed_apps,
-            all_applications = all_applications,
-            all_users = all_users,
-            averages = averages,
-            reviewers = reviewers)
+            info=info,
+            teammates=team,
+            applications=applications,
+            reviewed_apps=reviewed_apps,
+            all_applications=all_applications,
+            all_users=all_users,
+            averages=averages,
+            reviewers=reviewers)
 
     elif is_evals:
         return render_template(
             'index.html',
-            info = info,
-            all_applications = all_applications,
-            all_users = all_users,
-            averages = averages,
-            reviewers = reviewers)
-    
+            info=info,
+            all_applications=all_applications,
+            all_users=all_users,
+            averages=averages,
+            reviewers=reviewers)
 
-if __name__ =="__main__":
+
+if __name__ == "__main__":
     app.run()
 
-application = app   
+application = app
