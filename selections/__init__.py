@@ -42,7 +42,7 @@ def main(info = None):
     member = members.query.filter_by(username=info['uid']).first()
     if member != None:
         team = members.query.filter_by(team=member.team)
-        reviewed_apps = [a.id for a in submission.query.filter_by(member=info['uid']).all()]
+        reviewed_apps = [a.application for a in submission.query.filter_by(member=info['uid']).all()]
         applications = [{
             "id": a.id,
             "gender": a.gender,
@@ -136,12 +136,12 @@ def submit(app_id):
         return("You are not allowed to review this application!")
     
     for field in fields:
-        if not field["min"] < field["value"] < field["max"]:
+        if not field["min"] <= int(field["value"]) <= field["max"]:
             return("Please fill out the form correctly!")
 
     total_score = 0
     for field in fields:
-        total_score += (field["value"] * field["weight"])
+        total_score += (int(field["value"]) * field["weight"])
 
     member_score = submission(application=app_id, member=member.username, medium="Paper", score=total_score)
     db.session.add(member_score)

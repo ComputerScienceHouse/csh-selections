@@ -34,7 +34,7 @@
 											<th scope="row">{{criteria.name}}</th>
 											<td>{{criteria.min_score}} - {{criteria.max_score}}</td>
 											<td>{{criteria.weight}}</td>
-											<td style="padding-top:7px;"><input value="{{criteria.min_score}}" min="{{criteria.min_score}}" max="{{criteria.max_score}}" type="number" id="{{criteria.name}}" class="form-control form-control-sm" style="font-size: 13px;" form="application-rubric" required></td>
+											<td style="padding-top:7px;"><input value="{{criteria.min_score}}" min="{{criteria.min_score}}" max="{{criteria.max_score}}" type="number" name="{{criteria.name}}" id="{{criteria.name}}" class="form-control form-control-sm" style="font-size: 13px;" form="application-rubric" required></td>
 										</tr>
 										{% endfor %}
 									</tbody>
