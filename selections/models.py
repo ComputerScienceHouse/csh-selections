@@ -1,4 +1,5 @@
-from sqlalchemy import ForeignKey, Enum, Column, Integer, String
+from sqlalchemy import ForeignKey, Enum, Column, Integer, String, DateTime
+from sqlalchemy.sql import func
 
 from selections import db
 
@@ -9,9 +10,10 @@ interview_enum = Enum('Paper', 'Phone', name='interview_enum')
 class applicant(db.Model):
     __tablename__ = "application"
     id = Column(Integer, primary_key=True)
-    body = Column(String(5000))
-    team = Column(Integer)
-    gender = Column(gender_enum)
+    created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    body = Column(String(6000), nullable=False)
+    team = Column(Integer, nullable=False)
+    gender = Column(gender_enum, nullable=False)
 
 
 class members(db.Model):
@@ -21,17 +23,18 @@ class members(db.Model):
 
 class submission(db.Model):
     id = Column(Integer, primary_key=True)
-    application = Column(Integer, ForeignKey("application.id"))
-    member = Column(String(50), ForeignKey("members.username"))
-    medium = Column(interview_enum)
-    score = Column(Integer)
+    created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    application = Column(Integer, ForeignKey("application.id"), nullable=False)
+    member = Column(String(50), ForeignKey("members.username"), nullable=False)
+    medium = Column(interview_enum, nullable=False)
+    score = Column(Integer, nullable=False)
 
 
 class criteria(db.Model):
     id = Column(Integer, primary_key=True)
-    name = Column(String(25))
+    name = Column(String(25), nullable=False)
     description = Column(String(100))
-    min_score = Column(Integer)
-    max_score = Column(Integer)
-    weight = Column(Integer)
-    medium = Column(interview_enum)
+    min_score = Column(Integer, nullable=False)
+    max_score = Column(Integer, nullable=False)
+    weight = Column(Integer, nullable=False)
+    medium = Column(interview_enum, nullable=False)
