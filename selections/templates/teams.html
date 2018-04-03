@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container">
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for message in messages %}
+				<div class="alert alert-info" role="alert">{{ message }}</div>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+	{% for team_num in team_numbers %}
+    {% if team_num %}
+	<div class="card">
+		<div class="card-body">
+			<h3 class="card-title" style="text-align:left;">Team {{ team_num }}
+				<span style="float:right; font-size: 13px;">
+					<a href="#" data-toggle="modal" data-target="#add-modal-{{team_num}}" style="color: #4CAF50;">
+						<i class="fas fa-plus"></i> Add Member 
+					</a>
+				</span>
+			</h3>
+			<div class="row">
+				{% for teammate in teams[team_num] %}
+				<div class="col-6 col-sm-3 col-md-3">
+                    <div style="margin:auto; width:100px">
+					<img src="https://profiles.csh.rit.edu/image/{{ teammate }}" class="img-circle"
+					width="60" height="60" style="display:block; margin: 20px auto 0;">
+                    <a href="/teams/remove/{{teammate}}">
+                        <div class="team-remove"><i class="fas fa-times"></i></div>
+                    </a>
+                    </div>
+					<div style="text-align:center">
+						{{ teammate }}
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+    {% endif %}
+	{% endfor %}
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title" style="text-align:left;">Add Team</h3>
+            <form action="/teams" method="post" id="add-team">
+                <div class="form-group">
+                    <label for="team-number">Team Number</label>
+                    <input type="number" class="form-control" id="number" name="number" form="add-team">
+                </div>
+                <div class="form-group">
+                    <label for="members">Members</label>
+                    <input type="text" class="form-control" id="members" name="members" form="add-team">
+                </div>
+                <input type="submit" class="btn btn-primary" value="Create" form="add-team">
+            </form>
+        </div>
+    </div>
+
+	{% for team_num in team_numbers %}
+	<div class="modal" tabindex="-1" id="add-modal-{{team_num}}" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add Member to Group {{team_num}}</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form action="/teams/{{ team_num }}" method="post" id="add-form-{{team_num}}">
+					<div class="form-group">
+			            <label for="username" class="col-form-label">New Members</label>
+			            <input type="text" class="form-control" id="username" name="username" form="add-form-{{team_num}}">
+			          </div>
+				</div>
+				<div class="modal-footer">
+					<input type="submit" class="btn btn-primary" value="Save" form="add-form-{{team_num}}">
+				</div>
+			</form>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+</div>
+{% endblock %}

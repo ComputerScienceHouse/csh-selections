@@ -14,7 +14,8 @@ import docx
 @auth.oidc_auth
 @before_request
 def get_application(app_id, info=None):
-    reviewed = submission.query.filter_by(id=app_id).filter_by(member=info['uid']).first()
+    reviewed = submission.query.filter_by(
+        id=app_id).filter_by(member=info['uid']).first()
     if reviewed:
         flash("You already reviewed that application!")
         return redirect(url_for("main"))
@@ -96,8 +97,7 @@ def import_application(info=None):
         db.session.flush()
         db.session.commit()
 
-    if request.form.get("auto"):
-        assign_pending_applicants()
+    assign_pending_applicants()
 
     return get_application_creation()
 
@@ -128,7 +128,7 @@ def get_application_creation(info=None):
     is_evals = "eboard-evaluations" in info['member_info']['group_list']
     is_rtp = "rtp" in info['member_info']['group_list']
     if is_evals or is_rtp:
-        return render_template("admin.html", info=info)
+        return render_template("create.html", info=info)
     else:
         flash("You aren't allowed to see that page!")
         return redirect(url_for("main"))
@@ -151,7 +151,8 @@ def submit_application(app_id, info=None):
         "min": crit.min_score} for crit in criteria.query.filter_by(medium="Paper").all()]
     applicant_info = applicant.query.filter_by(id=app_id).first()
     member = members.query.filter_by(username=info['uid']).first()
-    submissions = [sub.member for sub in submission.query.filter_by(application=app_id).all()]
+    submissions = [sub.member for sub in submission.query.filter_by(
+        application=app_id).all()]
 
     if info['uid'] in submissions:
         flash("You have already reviewed this application!")
@@ -170,7 +171,8 @@ def submit_application(app_id, info=None):
     for field in fields:
         total_score += (int(field["value"]) * field["weight"])
 
-    member_score = submission(application=app_id, member=member.username, medium="Paper", score=total_score)
+    member_score = submission(
+        application=app_id, member=member.username, medium="Paper", score=total_score)
     db.session.add(member_score)
     db.session.flush()
     db.session.commit()

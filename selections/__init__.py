@@ -20,7 +20,8 @@ auth = OIDCAuthentication(app, issuer=app.config["OIDC_ISSUER"],
                           client_registration_info=app.config["OIDC_CLIENT_CONFIG"])
 
 # Create a connection to CSH LDAP
-_ldap = csh_ldap.CSHLDAP(app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'])
+_ldap = csh_ldap.CSHLDAP(
+    app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'])
 
 
 # Initalize the SQLAlchemy object and add models.
@@ -32,8 +33,10 @@ migrate = Migrate(app, db)
 
 # Load Applications Blueprint
 from selections.blueprints.application import *
+from selections.blueprints.teams import *
 
 from selections.utils import before_request, get_member_info
+
 
 @app.route("/")
 @auth.oidc_auth
@@ -55,7 +58,8 @@ def main(info=None):
         reviewers = defaultdict(list)
         for application in all_applications:
             score_sum = 0
-            results = submission.query.filter_by(application=application.id).all()
+            results = submission.query.filter_by(
+                application=application.id).all()
             for result in results:
                 score_sum += int(result.score)
                 reviewers[application.id].append(result.member)
@@ -68,7 +72,8 @@ def main(info=None):
 
     if member and member.team:
         team = members.query.filter_by(team=member.team)
-        reviewed_apps = [a.application for a in submission.query.filter_by(member=info['uid']).all()]
+        reviewed_apps = [a.application for a in submission.query.filter_by(
+            member=info['uid']).all()]
         applications = [{
             "id": a.id,
             "gender": a.gender,
