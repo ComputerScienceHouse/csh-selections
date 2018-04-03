@@ -22,7 +22,6 @@ auth = OIDCAuthentication(app, issuer=app.config["OIDC_ISSUER"],
 # Create a connection to CSH LDAP
 _ldap = csh_ldap.CSHLDAP(app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'])
 
-from selections.utils import before_request, get_member_info, process_image
 
 # Initalize the SQLAlchemy object and add models.
 # Make sure that you run the migrate task before running.
@@ -34,6 +33,7 @@ migrate = Migrate(app, db)
 # Load Applications Blueprint
 from selections.blueprints.application import *
 
+from selections.utils import before_request, get_member_info
 
 @app.route("/")
 @auth.oidc_auth
@@ -43,7 +43,6 @@ def main(info=None):
     all_users = []
     averages = []
     reviewers = []
-
     is_evals = "eboard-evaluations" in info['member_info']['group_list']
     is_rtp = "rtp" in info['member_info']['group_list']
     member = members.query.filter_by(username=info['uid']).first()
@@ -57,7 +56,6 @@ def main(info=None):
         for application in all_applications:
             score_sum = 0
             results = submission.query.filter_by(application=application.id).all()
-            print(results)
             for result in results:
                 score_sum += int(result.score)
                 reviewers[application.id].append(result.member)

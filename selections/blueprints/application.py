@@ -1,7 +1,13 @@
 from flask import render_template, redirect, url_for, flash, request
-from selections.utils import before_request
+
+from selections.utils import before_request, assign_pending_applicants
 from selections import app, auth
 from selections.models import *
+
+from collections import defaultdict
+from zipfile import BadZipFile
+
+import docx
 
 
 @app.route("/application/<app_id>")
@@ -37,6 +43,62 @@ def create_application(info=None):
     db.session.add(member)
     db.session.flush()
     db.session.commit()
+    return get_application_creation()
+
+
+@app.route("/application/import", methods=["POST"])
+@auth.oidc_auth
+@before_request
+def import_application(info=None):
+    word_file = request.files['file']
+    if not word_file:
+        return "No file", 400
+
+    gender = {"M": "Male",
+              "F": "Female"}
+
+    unparsed_applications = defaultdict(list)
+    applications = {}
+
+    try:
+        document = docx.Document(word_file)
+    except BadZipFile:
+        return "Not a valid Word file!"
+
+    iteration = 0
+
+    for paragraph in document.paragraphs:
+        if "Entry" not in paragraph.text:
+            unparsed_applications[iteration].append(paragraph.text[1:])
+        else:
+            iteration += 1
+
+    for array in unparsed_applications:
+        app_info = unparsed_applications[array][0].split("\t")
+        app_id = app_info[0]
+        app_gender = gender[app_info[1]]
+
+        app_text = app_info[2]
+
+        for line in unparsed_applications[array][1:]:
+            if line[-1:] == " ":
+                app_text += line
+            else:
+                app_text += "\n{}".format(line)
+
+        applications[app_id] = [app_gender, app_text]
+        new_app = applicant(
+            id=app_id,
+            body=app_text,
+            team=-1,
+            gender=app_gender)
+        db.session.add(new_app)
+        db.session.flush()
+        db.session.commit()
+
+    if request.form.get("auto"):
+        assign_pending_applicants()
+
     return get_application_creation()
 
 
@@ -82,13 +144,11 @@ def logout():
 @auth.oidc_auth
 @before_request
 def submit_application(app_id, info=None):
-    print(request.form)
     fields = [{
         "value": request.form.get(crit.name),
         "weight": crit.weight,
         "max": crit.max_score,
         "min": crit.min_score} for crit in criteria.query.filter_by(medium="Paper").all()]
-    print(fields)
     applicant_info = applicant.query.filter_by(id=app_id).first()
     member = members.query.filter_by(username=info['uid']).first()
     submissions = [sub.member for sub in submission.query.filter_by(application=app_id).all()]
