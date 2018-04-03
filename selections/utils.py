@@ -56,8 +56,12 @@ def get_member_info(uid):
 def assign_pending_applicants():
     pending = applicant.query.filter_by(team=-1).all()
     teams = set([member.team for member in members.query.all()])
+
+    if None in teams:
+        teams.remove(None)
+
     apps_per_team = ceil(len(pending)/len(teams))
-    
+
     div_apps = list(zip_longest(*(iter(pending),) * apps_per_team))
 
     app_group = 0
