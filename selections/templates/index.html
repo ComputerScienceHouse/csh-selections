@@ -61,6 +61,37 @@
             </div>
         {% endif %}
 
+		{% if phone %}
+             <div class="card">
+                 <div class="card-body">
+                     <h4 class="card-title">Phone Interviews</h4>
+                     <table class="table">
+                         <thead>
+                         <tr>
+                             <th scope="col">ID</th>
+                             <th scope="col">Gender</th>
+                         </tr>
+                         </thead>
+                         <tbody>
+                         {% for person in phone %}
+                             {% if not person.reviewed %}
+                                 <tr>
+                                     <th>
+                                         <a href="/application/phone/{{ person.id }}">
+                                             <i class="fas fa-phone"></i> {{ person.id }}
+                                         </a>
+                                     </th>
+                                     <td>{{ person.gender }}</td>
+                                 </tr>
+                             {% endif %}
+                         {% endfor %}
+                         </tbody>
+                     </table>
+
+                 </div>
+             </div>
+         {% endif %}
+
         {% if "eboard-evaluations" in info.member_info.group_list or "rtp" in info.member_info.group_list %}
             <div class="card">
                 <div class="card-body">

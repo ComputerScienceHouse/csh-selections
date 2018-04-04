@@ -74,10 +74,16 @@ def main(info=None):
         team = members.query.filter_by(team=member.team)
         reviewed_apps = [a.application for a in submission.query.filter_by(
             member=info['uid']).all()]
+        reviewed_phone = [a.application for a in submission.query.filter_by(
+            medium="Phone").all()]
         applications = [{
             "id": a.id,
             "gender": a.gender,
             "reviewed": a.id in reviewed_apps} for a in applicant.query.filter_by(team=member.team).all()]
+        phone = [{
+            "id": a.id,
+            "gender": a.gender,
+            "reviewed": a.id in reviewed_phone} for a in applicant.query.filter_by(phone_int=True).all()]
 
         return render_template(
             'index.html',
@@ -88,7 +94,8 @@ def main(info=None):
             all_applications=all_applications,
             all_users=all_users,
             averages=averages,
-            reviewers=reviewers)
+            reviewers=reviewers,
+            phone=phone)
 
     elif is_evals or is_rtp:
         return render_template(

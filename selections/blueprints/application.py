@@ -199,3 +199,28 @@ def review_application(app_id, info=None):
     else:
         flash("You aren't allowed to see that page!")
         return redirect(url_for("main"))
+
+
+@app.route("/application/phone/<app_id>", methods=['GET'])
+@auth.oidc_auth
+@before_request
+def get_phone_application(app_id, info=None):
+    is_evals = "eboard-evaluations" in info['member_info']['group_list']
+    is_rtp = "rtp" in info['member_info']['group_list']
+    if is_evals or is_rtp:
+        applicant_info = applicant.query.filter_by(id=app_id).first()
+        split_body = applicant_info.body.split("\n")
+        scores = [subs.score for subs in submission.query.filter_by(application=app_id).all()]
+    total = 0
+    if scores:
+        for score in scores:
+            total += score
+
+        total = total / len(scores)
+
+    return render_template(
+            "phone.html",
+            info=info,
+            app_score=total,
+            application=applicant_info,
+            split_body=split_body)

@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Enum, Column, Integer, String, DateTime
+from sqlalchemy import ForeignKey, Enum, Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql import func
 
 from selections import db
@@ -14,6 +14,8 @@ class applicant(db.Model):
     body = Column(String(6000), nullable=False)
     team = Column(Integer, nullable=False)
     gender = Column(gender_enum, nullable=False)
+    phone_int = Column(Boolean, server_default="0", nullable=False)
+
 
 
 class members(db.Model):
@@ -26,7 +28,7 @@ class submission(db.Model):
     created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     application = Column(Integer, ForeignKey("application.id"), nullable=False)
     member = Column(String(50), ForeignKey("members.username"), nullable=False)
-    medium = Column(interview_enum, nullable=False)
+    medium = Column(interview_enum, primary_key=True)
     score = Column(Integer, nullable=False)
 
 

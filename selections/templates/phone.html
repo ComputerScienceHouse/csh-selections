@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="container">
+    <div class="row">
+    <div class="col-md-12 col-lg-7 col-xl-8">
+    <div class="card">
+        <div class="card-body">
+			<h3 class="card-title">Phone Interview {{ application.id }}</h3>
+                 <h6 class="card-subtitle mb-2 text-muted">Gender: {{ application.gender }}</h6>
+                 {% for paragraph in split_body %}
+                     <p class="card-text">{{ paragraph }}</p>
+                 {% endfor %}
+        </div>
+    </div>
+    </div>
+    <div class="col-md-12 col-lg-5 col-xl-4">
+	<div class="card">
+        <div class="card-body">
+        <form class="" role="form">
+        	<h3 class="card-title">Interview Rating</h3>
+            <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> 
+                You will only submit one of these forms per applicant!
+            </div>
+        	<p class="card-text">Based on the applicant's responses to the questions asked during their interview and your overall feeling, please adjust their total score appropriately.</p> 
+          <div class="phone-slider">
+            <div class="col-sm-12">
+              <div id="slider"></div>
+            </div>
+          </div>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <input type="hidden" id="amount" class="form-control" name="score">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h6>Final Score</h6>
+	                <h1 id="amount-final"></h1>
+            	</div>
+              </div>
+            </div>
+
+
+          <div class="form-group">
+            <div class="col-sm-12" style="text-align: center;">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+
+        </form>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+          $("#slider").slider({
+              animate: false,
+              value: 0,
+              min: -150,
+              max: 150,
+              step: 1,
+              slide: function(event, ui) {
+                  update(1,ui.value); //changed
+              }
+          });
+
+          //Added, set initial value.
+          $("#amount").val(0);
+          $("#amount-final").val({{app_score}});
+          update();
+      });
+
+      //changed. now with parameter
+      function update(slider,val) {
+        //changed. Now, directly take value from ui.value. if not set (initial, will use current value.)
+        var $amount = slider == 1?val:$("#amount").val();
+
+        /* commented
+        $amount = $( "#slider" ).slider( "value" );
+        $duration = $( "#slider2" ).slider( "value" );
+         */
+        var $original = {{ app_score }};
+        var $final = parseInt($amount) + $original;
+         
+         $( "#amount" ).val($amount);
+         $( "#amount-final" ).text($final);
+         
+
+         $('#slider a').html('<label style="padding-top:1px;"><i style="padding-top:2px;" class="fas fa-chevron-left"></i> '+$amount+' <i style="padding-top:2px;"class="fas fa-chevron-right"></i></label>');
+         
+      }
+</script>
+{% endblock %}
