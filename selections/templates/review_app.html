@@ -5,7 +5,21 @@
             <div class="card-body">
                 <h3 class="card-title" style="text-align:left;">Application {{ application.id }}
                     <span style="float:right; font-size: 13px;">
-				<a href="/application/delete/{{ application.id }}" style="color: #F00;"><i class="far fa-trash-alt"></i> Delete</a>
+                {% if not evaluated %}
+                <a href="/application/phone/{{ application.id }}" style="color: #2196F3;">
+                    <button type="button" class="btn btn-info btn-sm">
+                        <i class="fas fa-phone"></i> Submit Interview
+                    </button>
+                </a>
+                {% endif %}
+                {% if "eboard-evaluations" in info.member_info.group_list or "rtp" in info.member_info.group_list %}
+				<a href="/application/delete/{{ application.id }}" style="color: #e51c23;">
+                    <button type="button" class="btn btn-danger btn-sm">
+                        <i class="far fa-trash-alt"></i> Delete
+                    </button>
+                </a>
+                {% endif %}
+
 			</span></h3>
                 <h6 class="card-subtitle mb-2 text-muted">Gender: {{ application.gender }}</h6>
                 <h6 class="card-subtitle mb-2 text-muted">Team: {{ application.team }}</h6>
@@ -17,8 +31,19 @@
         {% for score in scores %}
             <div class="card">
                 <div class="card-body">
-                    <h3 class="card-title">{{ score.member }}</h3>
-                    <h6 class="card-subtitle mb-2 text-muted">Score: {{ score.score }}</h6>
+                    <div class="row">
+                        <div class="col-2 col-md-1">
+                            {% if score.medium == "Paper" %}
+                            <center><i style="margin-top:8px;" class="far fa-clipboard fa-3x"></i></center>
+                            {% else %}
+                            <center><i style="margin-top:8px;" class="fas fa-phone fa-3x"></i></center>
+                            {% endif %}
+                        </div>
+                        <div class="col-10 col-md-11">
+                            <h3 class="card-title">{{ score.member }}</h3>
+                            <h6 class="card-subtitle mb-2 text-muted">Score: {{ score.score }}</h6>
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endfor %}

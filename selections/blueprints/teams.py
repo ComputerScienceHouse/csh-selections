@@ -9,7 +9,12 @@ from selections.models import *
 @auth.oidc_auth
 @before_request
 def get_teams(info=None):
+    is_evals = "eboard-evaluations" in info['member_info']['group_list']
+    is_rtp = "rtp" in info['member_info']['group_list']
 
+    if not is_evals and not is_rtp:
+        return "Not Evals or an RTP"
+        
     team_numbers = set([member.team for member in members.query.all()])
 
     if None in team_numbers:

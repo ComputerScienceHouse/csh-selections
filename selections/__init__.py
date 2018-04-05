@@ -42,48 +42,44 @@ from selections.utils import before_request, get_member_info
 @auth.oidc_auth
 @before_request
 def main(info=None):
-    all_applications = []
-    all_users = []
-    averages = []
-    reviewers = []
     is_evals = "eboard-evaluations" in info['member_info']['group_list']
     is_rtp = "rtp" in info['member_info']['group_list']
     member = members.query.filter_by(username=info['uid']).first()
 
-    if is_evals or is_rtp:
-        all_applications = applicant.query.all()
-        all_users = members.query.all()
+    all_applications = applicant.query.all()
+    all_users = [u.username for u in members.query.all()]
 
-        averages = {}
-        reviewers = defaultdict(list)
-        for application in all_applications:
-            score_sum = 0
-            results = submission.query.filter_by(
-                application=application.id).all()
-            for result in results:
-                score_sum += int(result.score)
-                reviewers[application.id].append(result.member)
-                reviewers[application.id] = sorted(reviewers[application.id])
-            if len(results) != 0:
-                averages[application.id] = int(score_sum / len(results))
-            else:
-                averages[application.id] = "N/A"
-                reviewers[application.id] = []
+    averages = {}
+    reviewers = defaultdict(list)
+    for application in all_applications:
+        score_sum = 0
+        results = submission.query.filter_by(
+            application=application.id,
+            medium="Paper").all()
+        phone_r = submission.query.filter_by(
+            application=application.id,
+            medium="Phone").first()
+        for result in results:
+            score_sum += int(result.score)
+            reviewers[application.id].append(result.member)
+            reviewers[application.id] = sorted(reviewers[application.id])
+        if len(results) != 0:
+            avg = int(score_sum / len(results))
+            if phone_r:
+                avg += phone_r.score
+            averages[application.id] = avg
+        else:
+            averages[application.id] = "N/A"
+            reviewers[application.id] = []
 
-    if member and member.team:
+    if member and member.team or is_evals or is_rtp:
         team = members.query.filter_by(team=member.team)
         reviewed_apps = [a.application for a in submission.query.filter_by(
             member=info['uid']).all()]
-        reviewed_phone = [a.application for a in submission.query.filter_by(
-            medium="Phone").all()]
         applications = [{
             "id": a.id,
             "gender": a.gender,
             "reviewed": a.id in reviewed_apps} for a in applicant.query.filter_by(team=member.team).all()]
-        phone = [{
-            "id": a.id,
-            "gender": a.gender,
-            "reviewed": a.id in reviewed_phone} for a in applicant.query.filter_by(phone_int=True).all()]
 
         return render_template(
             'index.html',
@@ -91,16 +87,6 @@ def main(info=None):
             teammates=team,
             applications=applications,
             reviewed_apps=reviewed_apps,
-            all_applications=all_applications,
-            all_users=all_users,
-            averages=averages,
-            reviewers=reviewers,
-            phone=phone)
-
-    elif is_evals or is_rtp:
-        return render_template(
-            'index.html',
-            info=info,
             all_applications=all_applications,
             all_users=all_users,
             averages=averages,

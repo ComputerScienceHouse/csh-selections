@@ -184,33 +184,26 @@ def submit_application(app_id, info=None):
 @auth.oidc_auth
 @before_request
 def review_application(app_id, info=None):
-    is_evals = "eboard-evaluations" in info['member_info']['group_list']
-    is_rtp = "rtp" in info['member_info']['group_list']
-    if is_evals or is_rtp:
-        applicant_info = applicant.query.filter_by(id=app_id).first()
-        scores = submission.query.filter_by(application=app_id).all()
-        split_body = applicant_info.body.split("\n")
-        return render_template(
-            'review_app.html',
-            info=info,
-            application=applicant_info,
-            scores=scores,
-            split_body=split_body)
-    else:
-        flash("You aren't allowed to see that page!")
-        return redirect(url_for("main"))
+    applicant_info = applicant.query.filter_by(id=app_id).first()
+    evaluated = bool(submission.query.filter_by(application=app_id, medium="Phone").all())
+    scores = submission.query.filter_by(application=app_id).all()
+    split_body = applicant_info.body.split("\n")
+    return render_template(
+        'review_app.html',
+        info=info,
+        application=applicant_info,
+        scores=scores,
+        split_body=split_body,
+        evaluated = evaluated)
 
 
 @app.route("/application/phone/<app_id>", methods=['GET'])
 @auth.oidc_auth
 @before_request
 def get_phone_application(app_id, info=None):
-    is_evals = "eboard-evaluations" in info['member_info']['group_list']
-    is_rtp = "rtp" in info['member_info']['group_list']
-    if is_evals or is_rtp:
-        applicant_info = applicant.query.filter_by(id=app_id).first()
-        split_body = applicant_info.body.split("\n")
-        scores = [subs.score for subs in submission.query.filter_by(application=app_id).all()]
+    applicant_info = applicant.query.filter_by(id=app_id).first()
+    split_body = applicant_info.body.split("\n")
+    scores = [subs.score for subs in submission.query.filter_by(application=app_id).all()]
     total = 0
     if scores:
         for score in scores:
@@ -224,3 +217,19 @@ def get_phone_application(app_id, info=None):
             app_score=total,
             application=applicant_info,
             split_body=split_body)
+
+
+@app.route("/application/phone/<app_id>", methods=["POST"])
+@auth.oidc_auth
+@before_request
+def promote_application(app_id, info=None):
+    score = request.form.get("score")
+    new_submit = submission(
+        application = app_id,
+        member = info['uid'],
+        medium = "Phone",
+        score = score)
+    db.session.add(new_submit)
+    db.session.flush()
+    db.session.commit()
+    return redirect("/", 302)
