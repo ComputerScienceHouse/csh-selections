@@ -61,6 +61,8 @@ def import_application(info=None):
     unparsed_applications = defaultdict(list)
     applications = {}
 
+    old_apps = [int(app.id) for app in applicant.query.all()]
+
     try:
         document = docx.Document(word_file)
     except BadZipFile:
@@ -78,8 +80,10 @@ def import_application(info=None):
         app_info = unparsed_applications[array][0].split("\t")
         app_id = app_info[0]
         app_gender = gender[app_info[1]]
-
         app_text = app_info[2]
+        if int(app_id) in old_apps:
+            # If the application is already in the DB, skip it.
+            continue
 
         for line in unparsed_applications[array][1:]:
             if line[-1:] == " ":
