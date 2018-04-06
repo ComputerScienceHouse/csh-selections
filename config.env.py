@@ -10,7 +10,9 @@ SERVER_NAME = env.get('SERVER_NAME', 'selections-dev.csh.rit.edu')
 
 # DB Info
 SQLALCHEMY_DATABASE_URI = env.get('SQLALCHEMY_DATABASE_URI', 'sqlite:///{}'.format(os.path.join(os.getcwd(), "data.db")))
-
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_POOL_RECYCLE = 299
+SQLALCHEMY_POOL_TIMEOUT = 20
 # Openshift secret
 SECRET_KEY = env.get("SECRET_KEY", default=''.join(secrets.token_hex(16)))
 
