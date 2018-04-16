@@ -69,7 +69,7 @@ def main(info=None):
                 avg += phone_r.score
             averages[application.id] = avg
         else:
-            averages[application.id] = "N/A"
+            averages[application.id] = 0
             reviewers[application.id] = []
 
     if member and member.team or is_evals or is_rtp:
@@ -79,7 +79,8 @@ def main(info=None):
         applications = [{
             "id": a.id,
             "gender": a.gender,
-            "reviewed": a.id in reviewed_apps} for a in applicant.query.filter_by(team=member.team).all()]
+            "reviewed": a.id in reviewed_apps,
+            "review_count": submission.query.filter_by(application=a.id).count()} for a in applicant.query.filter_by(team=member.team).all()]
 
         return render_template(
             'index.html',
