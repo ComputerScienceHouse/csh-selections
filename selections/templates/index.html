@@ -43,7 +43,7 @@
                         </thead>
                         <tbody>
                         {% for person in applications %}
-                            {% if not person.reviewed %}
+                            {% if not person.reviewed and person.review_count < 4%}
                                 <tr>
                                     <th>
                                         <a href="/application/{{ person.id }}">
