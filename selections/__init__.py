@@ -69,7 +69,7 @@ def main(info=None):
                 avg += phone_r.score
             averages[application.id] = avg
         else:
-            averages[application.id] = "N/A"
+            averages[application.id] = 0
             reviewers[application.id] = []
 
     if member and member.team or is_evals or is_rtp:
