@@ -80,6 +80,7 @@ def main(info=None):
             "id": a.id,
             "gender": a.gender,
             "reviewed": a.id in reviewed_apps,
+            "interview": a.phone_int,
             "review_count": submission.query.filter_by(application=a.id).count()} for a in applicant.query.filter_by(team=member.team).all()]
 
         return render_template(

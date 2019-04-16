@@ -71,6 +71,7 @@
                             <th>ID</th>
                             <th>Gender</th>
                             <th>Reviewers</th>
+                            <th>Interview</th>
                             <th>Score</th>
                         </tr>
                         </thead>
@@ -87,6 +88,9 @@
                                              src="https://profiles.csh.rit.edu/image/{{ member }}" data-toggle="tooltip"
                                              data-placement="top" title="{{ member }}">
                                     {% endfor %}
+                                </td>
+                                <td>
+                                    {{ application.interview }}
                                 </td>
                                 <td>{{ averages[application.id] }}</td>
                             </tr>
