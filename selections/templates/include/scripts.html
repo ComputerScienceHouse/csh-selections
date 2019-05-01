@@ -10,11 +10,21 @@
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
 
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+
 <script type="text/javascript">
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
   $('#results-table').DataTable({
   	responsive: true,
-    order: [3, 'desc']});
+    order: [4, 'desc'],
+    columns: [
+        { responsivePriority: 1 },
+        { responsivePriority: 2 },
+        { responsivePriority: 3 },
+        { responsivePriority: 4 },
+        { responsivePriority: 1 }
+    ]
+  });
 })
 </script>
