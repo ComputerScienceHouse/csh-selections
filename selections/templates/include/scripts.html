@@ -15,6 +15,14 @@ $(function () {
   $('[data-toggle="tooltip"]').tooltip()
   $('#results-table').DataTable({
   	responsive: true,
-    order: [4, 'desc']});
+    order: [4, 'desc'],
+    columns: [
+        { responsivePriority: 1 },
+        { responsivePriority: 2 },
+        { responsivePriority: 3 },
+        { responsivePriority: 4 },
+        { responsivePriority: 1 }
+    ]
+  });
 })
 </script>
