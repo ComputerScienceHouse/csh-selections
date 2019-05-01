@@ -51,6 +51,7 @@ def main(info=None):
 
     averages = {}
     reviewers = defaultdict(list)
+    evaluated = {}
     for application in all_applications:
         score_sum = 0
         results = submission.query.filter_by(
@@ -71,6 +72,7 @@ def main(info=None):
         else:
             averages[application.id] = 0
             reviewers[application.id] = []
+        evaluated[application.id] = bool(submission.query.filter_by(application=application.id, medium="Phone").all())
 
     if member and member.team or is_evals or is_rtp:
         team = members.query.filter_by(team=member.team)
@@ -80,6 +82,7 @@ def main(info=None):
             "id": a.id,
             "gender": a.gender,
             "reviewed": a.id in reviewed_apps,
+            "interview": a.phone_int,
             "review_count": submission.query.filter_by(application=a.id).count()} for a in applicant.query.filter_by(team=member.team).all()]
 
         return render_template(
@@ -91,6 +94,7 @@ def main(info=None):
             all_applications=all_applications,
             all_users=all_users,
             averages=averages,
+            evaluated=evaluated,
             reviewers=reviewers)
 
 
