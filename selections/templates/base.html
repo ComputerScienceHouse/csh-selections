@@ -26,7 +26,16 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
 
         <link rel="stylesheet" href="/static/css/style.css">
-
+        
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134137724-8"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('set', {'user_id': '{{ info.uid }}' });
+          gtag('config', 'UA-134137724-8');
+        </script>
     </head>
 {% endblock %}
 
