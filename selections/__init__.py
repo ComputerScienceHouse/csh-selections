@@ -6,6 +6,9 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_pyoidc.flask_pyoidc import OIDCAuthentication
 from flask_sqlalchemy import SQLAlchemy
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
 # Create the initial Flask Object
 app = Flask(__name__)
@@ -23,6 +26,11 @@ auth = OIDCAuthentication(app, issuer=app.config["OIDC_ISSUER"],
 _ldap = csh_ldap.CSHLDAP(
     app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'])
 
+# Sentry
+sentry_sdk.init(
+    dsn=app.config['SENTRY_DSN'],
+    integrations=[FlaskIntegration(), SqlalchemyIntegration()],
+)
 
 # Initalize the SQLAlchemy object and add models.
 # Make sure that you run the migrate task before running.
