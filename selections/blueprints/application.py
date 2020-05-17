@@ -145,12 +145,6 @@ def get_application_creation(info=None):
         return redirect(url_for('main'))
 
 
-@app.route('/logout')
-@auth.oidc_logout
-def logout():
-    return redirect('/', 302)
-
-
 @app.route('/application/<app_id>', methods=['POST'])
 @auth.oidc_auth
 @before_request

@@ -125,6 +125,12 @@ def main(info=None):
             all_users=all_users)
 
 
+@app.route('/logout')
+@auth.oidc_logout
+def logout():
+    return redirect('/', 302)
+
+
 if __name__ == '__main__':
     app.run()
 
