@@ -109,6 +109,7 @@ def main(info=None):
             evaluated=evaluated,
             reviewers=reviewers)
     elif is_evals or is_rtp:
+        all_users.append(info['uid'])
         return render_template(
             'index.html',
             info=info,
@@ -117,6 +118,11 @@ def main(info=None):
             averages=averages,
             evaluated=evaluated,
             reviewers=reviewers)
+    else:
+        return render_template(
+            'index.html',
+            info=info,
+            all_users=all_users)
 
 
 if __name__ == '__main__':

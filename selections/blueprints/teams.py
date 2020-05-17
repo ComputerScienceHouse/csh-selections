@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request
+from flask import render_template, redirect, url_for, flash, request
 
 from selections.utils import before_request
 from selections import app, auth, db
@@ -13,7 +13,8 @@ def get_teams(info=None):
     is_rtp = 'rtp' in info['member_info']['group_list']
 
     if not is_evals and not is_rtp:
-        return 'Not Evals or an RTP'
+        flash('Not Evals or an RTP')
+        return redirect(url_for('main'))
 
     team_numbers = {member.team for member in Members.query.all()}
 
@@ -40,7 +41,8 @@ def create_team(info=None):
     is_rtp = 'rtp' in info['member_info']['group_list']
 
     if not is_evals and not is_rtp:
-        return 'Not Evals or an RTP'
+        flash('Not Evals or an RTP')
+        return redirect(url_for('main'))
 
     team_number = request.form.get('number')
     new_members = request.form.get('members')
@@ -74,7 +76,8 @@ def add_to_team(team_id, info=None):
     is_rtp = 'rtp' in info['member_info']['group_list']
 
     if not is_evals and not is_rtp:
-        return 'Not Evals or an RTP'
+        flash('Not Evals or an RTP')
+        return redirect(url_for('main'))
 
     form_input = request.form.get('username')
     usernames = []

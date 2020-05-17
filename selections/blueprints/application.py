@@ -13,13 +13,19 @@ from selections.models import Applicant, Criteria, db, Members, Submission
 @auth.oidc_auth
 @before_request
 def get_application(app_id, info=None):
+    applicant_info = Applicant.query.filter_by(id=app_id).first()
+    member = Members.query.filter_by(username=info['uid']).first()
+    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
+    is_rtp = 'rtp' in info['member_info']['group_list']
+    if not member and not (is_rtp or is_evals):
+        return redirect(url_for('main'))
+
     reviewed = Submission.query.filter_by(
         id=app_id).filter_by(member=info['uid']).first()
     if reviewed:
         flash('You already reviewed that application!')
         return redirect(url_for('main'))
 
-    applicant_info = Applicant.query.filter_by(id=app_id).first()
     split_body = applicant_info.body.split('\n')
     fields = Criteria.query.filter_by(medium='Paper').all()
     return render_template(
@@ -122,6 +128,8 @@ def delete_application(app_id, info=None):
         db.session.flush()
         db.session.commit()
         return redirect('/', 302)
+    flash("You can't delete applications.")
+    redirect(url_for('main'))
 
 
 @app.route('/application/create')
@@ -147,13 +155,17 @@ def logout():
 @auth.oidc_auth
 @before_request
 def submit_application(app_id, info=None):
+    member = Members.query.filter_by(username=info['uid']).first()
+    if not member:
+        flash("You can't score applications.")
+        return redirect(url_for('main'))
+
     fields = [{
         'value': request.form.get(crit.name),
         'weight': crit.weight,
         'max': crit.max_score,
         'min': crit.min_score} for crit in Criteria.query.filter_by(medium='Paper').all()]
     applicant_info = Applicant.query.filter_by(id=app_id).first()
-    member = Members.query.filter_by(username=info['uid']).first()
     submissions = [sub.member for sub in Submission.query.filter_by(
         application=app_id).all()]
 
