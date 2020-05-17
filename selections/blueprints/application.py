@@ -1,28 +1,27 @@
-from flask import render_template, redirect, url_for, flash, request
-
-from selections.utils import before_request, assign_pending_applicants
-from selections import app, auth
-from selections.models import *
-
 from collections import defaultdict
 from zipfile import BadZipFile
 
 import docx
+from flask import render_template, redirect, url_for, flash, request
+
+from selections.utils import before_request, assign_pending_applicants
+from selections import app, auth
+from selections.models import Applicant, Criteria, db, Members, Submission
 
 
 @app.route("/application/<app_id>")
 @auth.oidc_auth
 @before_request
 def get_application(app_id, info=None):
-    reviewed = submission.query.filter_by(
+    reviewed = Submission.query.filter_by(
         id=app_id).filter_by(member=info['uid']).first()
     if reviewed:
         flash("You already reviewed that application!")
         return redirect(url_for("main"))
 
-    applicant_info = applicant.query.filter_by(id=app_id).first()
+    applicant_info = Applicant.query.filter_by(id=app_id).first()
     split_body = applicant_info.body.split("\n")
-    fields = criteria.query.filter_by(medium="Paper").all()
+    fields = Criteria.query.filter_by(medium="Paper").all()
     return render_template(
         "vote.html",
         application=applicant_info,
@@ -34,14 +33,14 @@ def get_application(app_id, info=None):
 @app.route("/application", methods=["POST"])
 @auth.oidc_auth
 @before_request
-def create_application(info=None):
-    id = request.form.get("id")
-    member = applicant(
-        id=id,
+def create_application():
+    applicant_id = request.form.get("id")
+    applicant = Applicant(
+        id=applicant_id,
         body=request.form.get("application"),
         team=request.form.get("team"),
         gender=request.form.get("gender"))
-    db.session.add(member)
+    db.session.add(applicant)
     db.session.flush()
     db.session.commit()
     return get_application_creation()
@@ -50,7 +49,7 @@ def create_application(info=None):
 @app.route("/application/import", methods=["POST"])
 @auth.oidc_auth
 @before_request
-def import_application(info=None):
+def import_application():
     word_file = request.files['file']
     if not word_file:
         return "No file", 400
@@ -61,7 +60,7 @@ def import_application(info=None):
     unparsed_applications = defaultdict(list)
     applications = {}
 
-    old_apps = [int(app.id) for app in applicant.query.all()]
+    old_apps = [int(app.id) for app in Applicant.query.all()]
 
     try:
         document = docx.Document(word_file)
@@ -92,7 +91,7 @@ def import_application(info=None):
                 app_text += "\n{}".format(line)
 
         applications[app_id] = [app_gender, app_text]
-        new_app = applicant(
+        new_app = Applicant(
             id=app_id,
             body=app_text,
             team=-1,
@@ -113,8 +112,8 @@ def delete_application(app_id, info=None):
     is_evals = "eboard-evaluations" in info['member_info']['group_list']
     is_rtp = "rtp" in info['member_info']['group_list']
     if is_evals or is_rtp:
-        scores = submission.query.filter_by(application=app_id).all()
-        applicant_info = applicant.query.filter_by(id=app_id).first()
+        scores = Submission.query.filter_by(application=app_id).all()
+        applicant_info = Applicant.query.filter_by(id=app_id).first()
         for score in scores:
             db.session.delete(score)
             db.session.flush()
@@ -152,10 +151,10 @@ def submit_application(app_id, info=None):
         "value": request.form.get(crit.name),
         "weight": crit.weight,
         "max": crit.max_score,
-        "min": crit.min_score} for crit in criteria.query.filter_by(medium="Paper").all()]
-    applicant_info = applicant.query.filter_by(id=app_id).first()
-    member = members.query.filter_by(username=info['uid']).first()
-    submissions = [sub.member for sub in submission.query.filter_by(
+        "min": crit.min_score} for crit in Criteria.query.filter_by(medium="Paper").all()]
+    applicant_info = Applicant.query.filter_by(id=app_id).first()
+    member = Members.query.filter_by(username=info['uid']).first()
+    submissions = [sub.member for sub in Submission.query.filter_by(
         application=app_id).all()]
 
     if info['uid'] in submissions:
@@ -175,7 +174,7 @@ def submit_application(app_id, info=None):
     for field in fields:
         total_score += (int(field["value"]) * field["weight"])
 
-    member_score = submission(
+    member_score = Submission(
         application=app_id, member=member.username, medium="Paper", score=total_score)
     db.session.add(member_score)
     db.session.flush()
@@ -188,9 +187,9 @@ def submit_application(app_id, info=None):
 @auth.oidc_auth
 @before_request
 def review_application(app_id, info=None):
-    applicant_info = applicant.query.filter_by(id=app_id).first()
-    evaluated = bool(submission.query.filter_by(application=app_id, medium="Phone").all())
-    scores = submission.query.filter_by(application=app_id).all()
+    applicant_info = Applicant.query.filter_by(id=app_id).first()
+    evaluated = bool(Submission.query.filter_by(application=app_id, medium="Phone").all())
+    scores = Submission.query.filter_by(application=app_id).all()
     split_body = applicant_info.body.split("\n")
     return render_template(
         'review_app.html',
@@ -198,16 +197,16 @@ def review_application(app_id, info=None):
         application=applicant_info,
         scores=scores,
         split_body=split_body,
-        evaluated = evaluated)
+        evaluated=evaluated)
 
 
 @app.route("/application/phone/<app_id>", methods=['GET'])
 @auth.oidc_auth
 @before_request
 def get_phone_application(app_id, info=None):
-    applicant_info = applicant.query.filter_by(id=app_id).first()
+    applicant_info = Applicant.query.filter_by(id=app_id).first()
     split_body = applicant_info.body.split("\n")
-    scores = [subs.score for subs in submission.query.filter_by(application=app_id).all()]
+    scores = [subs.score for subs in Submission.query.filter_by(application=app_id).all()]
     total = 0
     if scores:
         for score in scores:
@@ -228,11 +227,11 @@ def get_phone_application(app_id, info=None):
 @before_request
 def promote_application(app_id, info=None):
     score = request.form.get("score")
-    new_submit = submission(
-        application = app_id,
-        member = info['uid'],
-        medium = "Phone",
-        score = score)
+    new_submit = Submission(
+        application=app_id,
+        member=info['uid'],
+        medium="Phone",
+        score=score)
     db.session.add(new_submit)
     db.session.flush()
     db.session.commit()

@@ -1,8 +1,8 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, request
 
 from selections.utils import before_request
 from selections import app, auth, db
-from selections.models import *
+from selections.models import Members
 
 
 @app.route("/teams")
@@ -14,8 +14,8 @@ def get_teams(info=None):
 
     if not is_evals and not is_rtp:
         return "Not Evals or an RTP"
-        
-    team_numbers = set([member.team for member in members.query.all()])
+
+    team_numbers = {member.team for member in Members.query.all()}
 
     if None in team_numbers:
         team_numbers.remove(None)
@@ -23,7 +23,7 @@ def get_teams(info=None):
     teams = {}
     for team in team_numbers:
         teams[team] = [
-            member.username for member in members.query.filter_by(team=team)]
+            member.username for member in Members.query.filter_by(team=team)]
 
     return render_template(
         'teams.html',
@@ -53,11 +53,11 @@ def create_team(info=None):
         usernames.append(new_members)
 
     for new_member in usernames:
-        member_data = members.query.filter_by(username=new_member).first()
+        member_data = Members.query.filter_by(username=new_member).first()
         if member_data:
             member_data.team = team_number
         else:
-            person = members(username=new_member, team=team_number)
+            person = Members(username=new_member, team=team_number)
             print(person.username)
             db.session.add(person)
 
@@ -85,11 +85,11 @@ def add_to_team(team_id, info=None):
         usernames.append(form_input)
 
     for new_member in usernames:
-        member_data = members.query.filter_by(username=new_member).first()
+        member_data = Members.query.filter_by(username=new_member).first()
         if member_data:
             member_data.team = team_id
         else:
-            person = members(username=new_member, team=team_id)
+            person = Members(username=new_member, team=team_id)
             print(person.username)
             db.session.add(person)
 
@@ -108,7 +108,7 @@ def remove_from_team(username, info=None):
     if not is_evals and not is_rtp:
         return "Not Evals or an RTP"
 
-    member = members.query.filter_by(username=username).first()
+    member = Members.query.filter_by(username=username).first()
     member.team = None
     db.session.commit()
     return redirect("/teams", 302)

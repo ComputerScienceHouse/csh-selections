@@ -7,7 +7,7 @@ gender_enum = Enum('Male', 'Female', 'Other', name='gender_enum')
 interview_enum = Enum('Paper', 'Phone', name='interview_enum')
 
 
-class applicant(db.Model):
+class Applicant(db.Model):
     __tablename__ = "application"
     id = Column(Integer, primary_key=True)
     created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -18,12 +18,12 @@ class applicant(db.Model):
 
 
 
-class members(db.Model):
+class Members(db.Model):
     username = Column(String(50), primary_key=True)
     team = Column(Integer)
 
 
-class submission(db.Model):
+class Submission(db.Model):
     id = Column(Integer, primary_key=True)
     created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     application = Column(Integer, ForeignKey("application.id"), nullable=False)
@@ -32,7 +32,7 @@ class submission(db.Model):
     score = Column(Integer, nullable=False)
 
 
-class criteria(db.Model):
+class Criteria(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(25), nullable=False)
     description = Column(String(100))

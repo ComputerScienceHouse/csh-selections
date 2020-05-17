@@ -187,41 +187,41 @@ def ldap_set_non_current_student(account):
     ldap_get_member.cache_clear()
 
 
-def ldap_update_profile(dict, uid):
+def ldap_update_profile(profile_dict, uid):
     account = _ldap.get_member(uid, uid=True)
 
-    if not dict["name"] == account.cn:
-        account.cn = dict["name"]
+    if not profile_dict["name"] == account.cn:
+        account.cn = profile_dict["name"]
 
-    if not dict["birthday"] == account.birthday:
-        account.birthday = dict["birthday"]
+    if not profile_dict["birthday"] == account.birthday:
+        account.birthday = profile_dict["birthday"]
 
-    if not dict["phone"] == account.mobile:
-        account.mobile = dict["phone"]
+    if not profile_dict["phone"] == account.mobile:
+        account.mobile = profile_dict["phone"]
 
-    if not dict["plex"] == account.plex:
-        account.plex = dict["plex"]
+    if not profile_dict["plex"] == account.plex:
+        account.plex = profile_dict["plex"]
 
-    if not dict["major"] == account.major:
-        account.major = dict["major"]
+    if not profile_dict["major"] == account.major:
+        account.major = profile_dict["major"]
 
-    if not dict["ritYear"] == account.ritYear:
-        account.ritYear = dict["ritYear"]
+    if not profile_dict["ritYear"] == account.ritYear:
+        account.ritYear = profile_dict["ritYear"]
 
-    if not dict["website"] == account.homepageURL:
-        account.homepageURL = dict["website"]
+    if not profile_dict["website"] == account.homepageURL:
+        account.homepageURL = profile_dict["website"]
 
-    if not dict["github"] == account.github:
-        account.github = dict["github"]
+    if not profile_dict["github"] == account.github:
+        account.github = profile_dict["github"]
 
-    if not dict["twitter"] == account.twitterName:
-        account.twitterName = dict["twitter"]
+    if not profile_dict["twitter"] == account.twitterName:
+        account.twitterName = profile_dict["twitter"]
 
-    if not dict["blog"] == account.blogURL:
-        account.blogURL = dict["blog"]
+    if not profile_dict["blog"] == account.blogURL:
+        account.blogURL = profile_dict["blog"]
 
-    if not dict["google"] == account.googleScreenName:
-        account.googleScreenName = dict["google"]
+    if not profile_dict["google"] == account.googleScreenName:
+        account.googleScreenName = profile_dict["google"]
 
 
 def ldap_get_roomnumber(account):
@@ -240,7 +240,7 @@ def ldap_search_members(query):
     # "(uid=%s)" % query,
     # ['uid'])
 
-    active = ldap_get_all_members();
+    active = ldap_get_all_members()
     results = []
     query = query.lower()
 
