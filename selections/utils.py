@@ -14,17 +14,17 @@ def before_request(func):
     @wraps(func)
     def wrapped_function(*args, **kwargs):
         git_revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').rstrip()
-        uuid = str(session["userinfo"].get("sub", ""))
-        uid = str(session["userinfo"].get("preferred_username", ""))
+        uuid = str(session['userinfo'].get('sub', ''))
+        uid = str(session['userinfo'].get('preferred_username', ''))
         user_obj = _ldap.get_member(uid, uid=True)
         info = {
-            "git_revision": git_revision,
-            "uuid": uuid,
-            "uid": uid,
-            "user_obj": user_obj,
-            "member_info": get_member_info(uid)
+            'git_revision': git_revision,
+            'uuid': uuid,
+            'uid': uid,
+            'user_obj': user_obj,
+            'member_info': get_member_info(uid)
         }
-        kwargs["info"] = info
+        kwargs['info'] = info
         return func(*args, **kwargs)
 
     return wrapped_function
@@ -34,16 +34,16 @@ def get_member_info(uid):
     account = ldap_get_member(uid)
 
     member_info = {
-        "user_obj": account,
-        "group_list": ldap_get_groups(account),
-        "uid": account.uid,
-        "name": account.cn,
-        "active": ldap_is_active(account),
-        "onfloor": ldap_is_onfloor(account),
-        "room": ldap_get_roomnumber(account),
-        "hp": account.housingPoints,
-        "plex": account.plex,
-        "rn": ldap_get_roomnumber(account)
+        'user_obj': account,
+        'group_list': ldap_get_groups(account),
+        'uid': account.uid,
+        'name': account.cn,
+        'active': ldap_is_active(account),
+        'onfloor': ldap_is_onfloor(account),
+        'room': ldap_get_roomnumber(account),
+        'hp': account.housingPoints,
+        'plex': account.plex,
+        'rn': ldap_get_roomnumber(account)
     }
     return member_info
 

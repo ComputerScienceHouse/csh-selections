@@ -33,6 +33,7 @@ pycparser==2.20
 pycryptodomex==3.9.7
 pyjwkest==1.4.2
 pylint==2.5.2
+pylint-quotes==0.2.1
 PyMySQL==0.8.0
 pyOpenSSL==19.1.0
 python-dateutil==2.8.1

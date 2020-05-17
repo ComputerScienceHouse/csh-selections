@@ -15,13 +15,13 @@ from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 app = Flask(__name__)
 
 # Check if deployed on OpenShift, if so use environment.
-if os.path.exists(os.path.join(os.getcwd(), "config.py")):
-    app.config.from_pyfile(os.path.join(os.getcwd(), "config.py"))
+if os.path.exists(os.path.join(os.getcwd(), 'config.py')):
+    app.config.from_pyfile(os.path.join(os.getcwd(), 'config.py'))
 else:
-    app.config.from_pyfile(os.path.join(os.getcwd(), "config.env.py"))
+    app.config.from_pyfile(os.path.join(os.getcwd(), 'config.env.py'))
 
-auth = OIDCAuthentication(app, issuer=app.config["OIDC_ISSUER"],
-                          client_registration_info=app.config["OIDC_CLIENT_CONFIG"])
+auth = OIDCAuthentication(app, issuer=app.config['OIDC_ISSUER'],
+                          client_registration_info=app.config['OIDC_CLIENT_CONFIG'])
 
 # Create a connection to CSH LDAP
 _ldap = csh_ldap.CSHLDAP(
@@ -47,12 +47,12 @@ from selections.blueprints.teams import *
 from selections.utils import before_request, get_member_info
 
 
-@app.route("/")
+@app.route('/')
 @auth.oidc_auth
 @before_request
 def main(info=None):
-    is_evals = "eboard-evaluations" in info['member_info']['group_list']
-    is_rtp = "rtp" in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
+    is_rtp = 'rtp' in info['member_info']['group_list']
     member = Members.query.filter_by(username=info['uid']).first()
 
     all_applications = Applicant.query.all()
@@ -65,10 +65,10 @@ def main(info=None):
         score_sum = 0
         results = Submission.query.filter_by(
             application=applicant.id,
-            medium="Paper").all()
+            medium='Paper').all()
         phone_r = Submission.query.filter_by(
             application=applicant.id,
-            medium="Phone").first()
+            medium='Phone').first()
         for result in results:
             score_sum += int(result.score)
             reviewers[applicant.id].append(result.member)
@@ -81,7 +81,7 @@ def main(info=None):
         else:
             averages[applicant.id] = 0
             reviewers[applicant.id] = []
-        evaluated[applicant.id] = bool(Submission.query.filter_by(application=applicant.id, medium="Phone").all())
+        evaluated[applicant.id] = bool(Submission.query.filter_by(application=applicant.id, medium='Phone').all())
 
     if member and member.team:
         team = Members.query.filter_by(team=member.team)
@@ -89,11 +89,11 @@ def main(info=None):
             member=info['uid']).all()]
         applications = [
                 {
-                    "id": a.id,
-                    "gender": a.gender,
-                    "reviewed": a.id in reviewed_apps,
-                    "interview": a.phone_int,
-                    "review_count": Submission.query.filter_by(application=a.id).count()
+                    'id': a.id,
+                    'gender': a.gender,
+                    'reviewed': a.id in reviewed_apps,
+                    'interview': a.phone_int,
+                    'review_count': Submission.query.filter_by(application=a.id).count()
                     } for a in Applicant.query.filter_by(team=member.team).all()
                 ]
 
@@ -119,7 +119,7 @@ def main(info=None):
             reviewers=reviewers)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run()
 
 application = app

@@ -8,13 +8,13 @@ interview_enum = Enum('Paper', 'Phone', name='interview_enum')
 
 
 class Applicant(db.Model):
-    __tablename__ = "application"
+    __tablename__ = 'application'
     id = Column(Integer, primary_key=True)
     created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     body = Column(String(6000), nullable=False)
     team = Column(Integer, nullable=False)
     gender = Column(gender_enum, nullable=False)
-    phone_int = Column(Boolean, server_default="0", nullable=False)
+    phone_int = Column(Boolean, server_default='0', nullable=False)
 
 
 
@@ -26,8 +26,8 @@ class Members(db.Model):
 class Submission(db.Model):
     id = Column(Integer, primary_key=True)
     created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    application = Column(Integer, ForeignKey("application.id"), nullable=False)
-    member = Column(String(50), ForeignKey("members.username"), nullable=False)
+    application = Column(Integer, ForeignKey('application.id'), nullable=False)
+    member = Column(String(50), ForeignKey('members.username'), nullable=False)
     medium = Column(interview_enum, primary_key=True)
     score = Column(Integer, nullable=False)
 
