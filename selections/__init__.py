@@ -82,7 +82,7 @@ def main(info=None):
             reviewers[application.id] = []
         evaluated[application.id] = bool(submission.query.filter_by(application=application.id, medium="Phone").all())
 
-    if member and member.team or is_evals or is_rtp:
+    if member and member.team:
         team = members.query.filter_by(team=member.team)
         reviewed_apps = [a.application for a in submission.query.filter_by(
             member=info['uid']).all()]
@@ -99,6 +99,15 @@ def main(info=None):
             teammates=team,
             applications=applications,
             reviewed_apps=reviewed_apps,
+            all_applications=all_applications,
+            all_users=all_users,
+            averages=averages,
+            evaluated=evaluated,
+            reviewers=reviewers)
+    elif is_evals or is_rtp:
+        return render_template(
+            'index.html',
+            info=info,
             all_applications=all_applications,
             all_users=all_users,
             averages=averages,
