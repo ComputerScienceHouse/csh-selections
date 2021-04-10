@@ -3,7 +3,7 @@ import secrets
 from os import environ as env
 
 # Flask config
-DEBUG = True
+DEBUG = env.get('DEBUG', 'False') == 'True'
 IP = env.get('IP', 'localhost')
 PORT = env.get('PORT', 8080)
 SERVER_NAME = env.get('SERVER_NAME', 'selections-dev.csh.rit.edu')
