@@ -2,7 +2,6 @@
 import os
 from collections import defaultdict
 
-import csh_ldap
 from flask import Flask
 from flask_migrate import Migrate
 from flask_pyoidc.flask_pyoidc import OIDCAuthentication
@@ -23,10 +22,6 @@ else:
 auth = OIDCAuthentication(app, issuer=app.config['OIDC_ISSUER'],
                           client_registration_info=app.config['OIDC_CLIENT_CONFIG'])
 
-# Create a connection to CSH LDAP
-_ldap = csh_ldap.CSHLDAP(
-    app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'])
-
 # Sentry
 sentry_sdk.init(
     dsn=app.config['SENTRY_DSN'],
@@ -44,15 +39,15 @@ migrate = Migrate(app, db)
 from selections.blueprints.application import *
 from selections.blueprints.teams import *
 
-from selections.utils import before_request, get_member_info
+from selections.utils import before_request
 
 
 @app.route('/')
 @auth.oidc_auth
 @before_request
 def main(info=None):
-    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
-    is_rtp = 'rtp' in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['group_list']
+    is_rtp = 'rtp' in info['group_list']
     member = Members.query.filter_by(username=info['uid']).first()
 
     all_applications = Applicant.query.all()

@@ -15,8 +15,8 @@ from selections.models import Applicant, Criteria, db, Members, Submission
 def get_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
     member = Members.query.filter_by(username=info['uid']).first()
-    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
-    is_rtp = 'rtp' in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['group_list']
+    is_rtp = 'rtp' in info['group_list']
     if not member and not (is_rtp or is_evals):
         return redirect(url_for('main'))
 
@@ -115,8 +115,8 @@ def import_application():
 @auth.oidc_auth
 @before_request
 def delete_application(app_id, info=None):
-    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
-    is_rtp = 'rtp' in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['group_list']
+    is_rtp = 'rtp' in info['group_list']
     if is_evals or is_rtp:
         scores = Submission.query.filter_by(application=app_id).all()
         applicant_info = Applicant.query.filter_by(id=app_id).first()
@@ -136,8 +136,8 @@ def delete_application(app_id, info=None):
 @auth.oidc_auth
 @before_request
 def get_application_creation(info=None):
-    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
-    is_rtp = 'rtp' in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['group_list']
+    is_rtp = 'rtp' in info['group_list']
     if is_evals or is_rtp:
         return render_template('create.html', info=info)
     else:

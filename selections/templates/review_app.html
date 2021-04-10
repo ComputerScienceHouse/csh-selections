@@ -12,7 +12,7 @@
                     </button>
                 </a>
                 {% endif %}
-                {% if "eboard-evaluations" in info.member_info.group_list or "rtp" in info.member_info.group_list %}
+                {% if "eboard-evaluations" in info.group_list or "rtp" in info.group_list %}
 				<a href="/application/delete/{{ application.id }}" style="color: #e51c23;">
                     <button type="button" class="btn btn-danger btn-sm">
                         <i class="far fa-trash-alt"></i> Delete
