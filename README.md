@@ -38,3 +38,10 @@ To run pylint use this command:
 ```bash
 pylint --load-plugins pylint_quotes selections
 ```
+
+## Administration
+### Preparing selections for a new year
+Please see the [new year guide](./docs/new_year_guide.md).
+
+### Deploying selections
+Deployment resources and documentation are in the [deploy directory](./deploy).
