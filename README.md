@@ -1,5 +1,5 @@
 # Selections
-[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
+[![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![Build Status](https://travis-ci.org/ComputerScienceHouse/csh-selections.svg?branch=develop)](https://travis-ci.org/ComputerScienceHouse/csh-selections)
 
 Selections is a Flask / Python web app meant to help facilitate the application review process for Computer Science House.
