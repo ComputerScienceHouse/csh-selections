@@ -2,7 +2,6 @@
 import os
 from collections import defaultdict
 
-import ldap
 import csh_ldap
 from flask import Flask
 from flask_migrate import Migrate
@@ -25,7 +24,6 @@ auth = OIDCAuthentication(app, issuer=app.config['OIDC_ISSUER'],
                           client_registration_info=app.config['OIDC_CLIENT_CONFIG'])
 
 # Create a connection to CSH LDAP
-ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
 _ldap = csh_ldap.CSHLDAP(
     app.config['LDAP_BIND_DN'], app.config['LDAP_BIND_PASS'])
 
