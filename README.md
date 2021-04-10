@@ -36,7 +36,7 @@ Please run pylint locally before making your PR, it will help save you some time
 
 To run pylint use this command:
 ```bash
-pylint --load-plugins pylint_quotes selections
+pylint selections
 ```
 
 ## Administration
