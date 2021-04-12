@@ -28,6 +28,14 @@ The application may be run locally with the following command.
 flask run -h localhost -p 8080
  ```
 
+### Profiling
+To profile selections, run 
+```bash
+python prof.py
+```
+
+This will setup the werzeug profiler, and output profiling results in logs for every request made.
+
 ## Code standards
 This project uses Pylint for linting and enforcement of code standards and styling.
 Every pull request of this project will be tested by Travis CI.
