@@ -15,6 +15,7 @@ class Applicant(db.Model):
     team = Column(Integer, nullable=False)
     gender = Column(gender_enum, nullable=False)
     phone_int = Column(Boolean, server_default='0', nullable=False)
+    rit_id = Column(String(20), nullable=False)
 
 
 

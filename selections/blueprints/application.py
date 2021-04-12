@@ -39,13 +39,14 @@ def get_application(app_id, info=None):
 @app.route('/application', methods=['POST'])
 @auth.oidc_auth
 @before_request
-def create_application():
-    applicant_id = request.form.get('id')
+def create_application(info=None):
+    applicant_rit_id = request.form.get('rit_id')
     applicant = Applicant(
-        id=applicant_id,
         body=request.form.get('application'),
         team=request.form.get('team'),
-        gender=request.form.get('gender'))
+        gender=request.form.get('gender'),
+        rit_id=applicant_rit_id,
+    )
     db.session.add(applicant)
     db.session.flush()
     db.session.commit()
@@ -66,7 +67,7 @@ def import_application():
     unparsed_applications = defaultdict(list)
     applications = {}
 
-    old_apps = [int(app.id) for app in Applicant.query.all()]
+    old_apps = [app.id for app in Applicant.query.all()]
 
     try:
         document = docx.Document(word_file)
@@ -83,10 +84,10 @@ def import_application():
 
     for array in unparsed_applications:
         app_info = unparsed_applications[array][0].split('\t')
-        app_id = app_info[0]
+        app_rit_id = app_info[0]
         app_gender = gender[app_info[1]]
         app_text = app_info[2]
-        if int(app_id) in old_apps:
+        if app_rit_id in old_apps:
             # If the application is already in the DB, skip it.
             continue
 
@@ -96,9 +97,9 @@ def import_application():
             else:
                 app_text += '\n{}'.format(line)
 
-        applications[app_id] = [app_gender, app_text]
+        applications[app_rit_id] = [app_gender, app_text]
         new_app = Applicant(
-            id=app_id,
+            rit_id=app_rit_id,
             body=app_text,
             team=-1,
             gender=app_gender)

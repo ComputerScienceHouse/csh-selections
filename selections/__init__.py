@@ -88,7 +88,8 @@ def main(info=None):
                     'gender': a.gender,
                     'reviewed': a.id in reviewed_apps,
                     'interview': a.phone_int,
-                    'review_count': Submission.query.filter_by(application=a.id).count()
+                    'review_count': Submission.query.filter_by(application=a.id).count(),
+                    'rit_id': a.rit_id,
                     } for a in Applicant.query.filter_by(team=member.team).all()
                 ]
 
