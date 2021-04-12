@@ -1,6 +1,7 @@
 # Selections
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![Linting](https://github.com/ComputerScienceHouse/csh-selections/actions/workflows/lint.yml/badge.svg)](https://github.com/ComputerScienceHouse/csh-selections/actions/workflows/lint.yml)
+[![version scheme](https://img.shields.io/badge/calver-YYYY.relnum-22bfda.svg)](https://calver.org/)
 
 Selections is a Flask / Python web app meant to help facilitate the application review process for Computer Science House.
 
