@@ -38,8 +38,7 @@ def get_application(app_id, info=None):
 
 @app.route('/application', methods=['POST'])
 @auth.oidc_auth
-@before_request
-def create_application(info=None):
+def create_application():
     applicant_rit_id = request.form.get('rit_id')
     applicant = Applicant(
         body=request.form.get('application'),
