@@ -9,8 +9,8 @@ from selections.models import Members
 @auth.oidc_auth
 @before_request
 def get_teams(info=None):
-    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
-    is_rtp = 'rtp' in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['group_list']
+    is_rtp = 'rtp' in info['group_list']
 
     if not is_evals and not is_rtp:
         flash('Not Evals or an RTP')
@@ -37,8 +37,8 @@ def get_teams(info=None):
 @auth.oidc_auth
 @before_request
 def create_team(info=None):
-    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
-    is_rtp = 'rtp' in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['group_list']
+    is_rtp = 'rtp' in info['group_list']
 
     if not is_evals and not is_rtp:
         flash('Not Evals or an RTP')
@@ -72,8 +72,8 @@ def create_team(info=None):
 @auth.oidc_auth
 @before_request
 def add_to_team(team_id, info=None):
-    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
-    is_rtp = 'rtp' in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['group_list']
+    is_rtp = 'rtp' in info['group_list']
 
     if not is_evals and not is_rtp:
         flash('Not Evals or an RTP')
@@ -105,8 +105,8 @@ def add_to_team(team_id, info=None):
 @auth.oidc_auth
 @before_request
 def remove_from_team(username, info=None):
-    is_evals = 'eboard-evaluations' in info['member_info']['group_list']
-    is_rtp = 'rtp' in info['member_info']['group_list']
+    is_evals = 'eboard-evaluations' in info['group_list']
+    is_rtp = 'rtp' in info['group_list']
 
     if not is_evals and not is_rtp:
         return 'Not Evals or an RTP'

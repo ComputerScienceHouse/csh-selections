@@ -1,0 +1,80 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      image.openshift.io/triggers: |-
+        [
+          {
+            "from": {
+              "kind": "ImageStreamTag",
+              "name": "dev:latest"
+            },
+            "fieldPath": "spec.template.spec.containers[0].image"
+          }
+        ]
+    name: dev
+    namespace: selections
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app: selections-dev
+    template:
+      metadata:
+        labels:
+          app: selections-dev
+      spec:
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: dev
+          image: image-registry.openshift-image-registry.svc:5000/selections/dev
+          imagePullPolicy: Always
+          name: selections
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      image.openshift.io/triggers: |-
+        [
+          {
+            "from": {
+              "kind": "ImageStreamTag",
+              "name": "prod:latest"
+            },
+            "fieldPath": "spec.template.spec.containers[0].image"
+          }
+        ]
+    name: prod
+    namespace: selections
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app: selections-prod
+    template:
+      metadata:
+        labels:
+          app: selections-prod
+      spec:
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: prod
+          image: image-registry.openshift-image-registry.svc:5000/selections/prod
+          imagePullPolicy: Always
+          name: selections
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

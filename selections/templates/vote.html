@@ -7,6 +7,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h3 class="card-title">Application {{ application.id }}</h3>
+                        <h6 class="card-subtitle mb-2 text-muted">RIT ID: {{ application.rit_id }}</h6>
                         <h6 class="card-subtitle mb-2 text-muted">Gender: {{ application.gender }}</h6>
                         {% for paragraph in split_body %}
                             <p class="card-text">{{ paragraph }}</p>

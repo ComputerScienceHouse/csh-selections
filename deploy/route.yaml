@@ -1,0 +1,36 @@
+apiVersion: v1
+items:
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: dev
+    namespace: selections
+  spec:
+    host: selections-dev.csh.rit.edu
+    port:
+      targetPort: 8080
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: dev
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: prod
+    namespace: selections
+  spec:
+    host: selections.csh.rit.edu
+    port:
+      targetPort: 8080
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: prod
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

@@ -39,6 +39,7 @@
                         <thead>
                         <tr>
                             <th scope="col">ID</th>
+                            <th scope="col">RIT ID</th>
                             <th scope="col">Gender</th>
                         </tr>
                         </thead>
@@ -51,6 +52,7 @@
                                             <i class="fas fa-clipboard-list"></i> {{ person.id }}
                                         </a>
                                     </th>
+                                    <td>{{ person.rit_id }}</td>
                                     <td>{{ person.gender }}</td>
                                 </tr>
                             {% endif %}
@@ -62,7 +64,7 @@
             </div>
         {% endif %}
 
-        {% if info.member_info.uid in all_users %}
+        {% if info.uid in all_users %}
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">All Applications</h4>
@@ -70,6 +72,7 @@
                         <thead>
                         <tr>
                             <th>ID</th>
+                            <th>RIT ID</th>
                             <th>Gender</th>
                             <th>Reviewers</th>
                             <th>Interview</th>
@@ -82,6 +85,7 @@
                                 <th>
                                     <a href="/application/review/{{ application.id }}"><i
                                             class="fas fa-clipboard-check"></i> {{ application.id }}</a></th>
+                                <td>{{ application.rit_id }}</td>
                                 <td>{{ application.gender }}</td>
                                 <td>
                                     {% for member in reviewers[application.id] %}
