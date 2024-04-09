@@ -15,8 +15,8 @@ from selections.models import Applicant, Criteria, db, Members, Submission
 def get_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
     member = Members.query.filter_by(username=info['uid']).first()
-    is_evals = 'eboard-evaluations' in info['group_list']
-    is_rtp = 'rtp' in info['group_list']
+    is_evals = '/eboard-evaluations' in info['group_list']
+    is_rtp = '/active_rtp' in info['group_list']
     if not member and not (is_rtp or is_evals):
         return redirect(url_for('main'))
 
