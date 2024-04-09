@@ -46,9 +46,6 @@ from selections.utils import before_request
 @auth.oidc_auth
 @before_request
 def main(info=None):
-    print(info)
-    print(info['group_list'])
-    print('/active_rtp' in info['group_list'])
     is_evals = '/eboard-evaluations' in info['group_list']
     is_rtp = '/active_rtp' in info['group_list']
     member = Members.query.filter_by(username=info['uid']).first()
