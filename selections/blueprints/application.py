@@ -115,7 +115,7 @@ def import_application():
 @auth.oidc_auth
 @before_request
 def delete_application(app_id, info=None):
-    is_evals = 'eboard-evaluations' in info['group_list']
+    is_evals = '/eboard-evaluations' in info['group_list']
     is_rtp = 'rtp' in info['group_list']
     if is_evals or is_rtp:
         scores = Submission.query.filter_by(application=app_id).all()
@@ -136,7 +136,7 @@ def delete_application(app_id, info=None):
 @auth.oidc_auth
 @before_request
 def get_application_creation(info=None):
-    is_evals = 'eboard-evaluations' in info['group_list']
+    is_evals = '/eboard-evaluations' in info['group_list']
     is_rtp = 'rtp' in info['group_list']
     if is_evals or is_rtp:
         return render_template('create.html', info=info)
