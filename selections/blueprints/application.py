@@ -13,6 +13,7 @@ from selections.models import Applicant, Criteria, db, Members, Submission
 @auth.oidc_auth
 @before_request
 def get_application(app_id, info=None):
+    print(info)
     applicant_info = Applicant.query.filter_by(id=app_id).first()
     member = Members.query.filter_by(username=info['uid']).first()
     is_evals = '/eboard-evaluations' in info['group_list']
