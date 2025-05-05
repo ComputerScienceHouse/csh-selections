@@ -4,7 +4,7 @@ from zipfile import BadZipFile
 from flask import render_template, redirect, url_for, flash, request
 
 from selections.utils import before_request, assign_pending_applicants
-from selections import app, auth, bucket
+from selections import app, auth, s3
 from selections.models import Applicant, Criteria, db, Members, Submission
 
 
@@ -40,17 +40,15 @@ def get_application(app_id, info=None):
 @app.route('/application', methods=['POST'])
 @auth.oidc_auth
 def create_application():
-    print(request.form)
     applicant_rit_id = request.form.get('rit_id')
     applicant = Applicant(
-        body=request.form.get('application'),
         team=request.form.get('team'),
         gender=request.form.get('gender'),
         rit_id=applicant_rit_id,
     )
     pdf = request.files['file']
-    print(pdf)
-    #bucket.upload_file()
+    pdf.save('/tmp/'+pdf.filename)
+    s3.upload_file('/tmp/'+pdf.filename, app.config['S3_BUCKET_NAME'], applicant_rit_id+'.pdf')
     db.session.add(applicant)
     db.session.flush()
     db.session.commit()
