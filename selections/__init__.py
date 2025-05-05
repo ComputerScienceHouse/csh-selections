@@ -35,12 +35,7 @@ from selections.models import *
 
 migrate = Migrate(app, db)
 
-# Load Applications Blueprint
-from selections.blueprints.application import *
-from selections.blueprints.teams import *
-
-from selections.utils import before_request
-
+#initialize S3
 import boto3
 session = boto3.Session(
     aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
@@ -48,6 +43,13 @@ session = boto3.Session(
 )
 s3 = session.resource('s3')
 bucket = s3.meta.client
+
+# Load Applications Blueprint
+from selections.blueprints.application import *
+from selections.blueprints.teams import *
+
+from selections.utils import before_request
+
 
 @app.route('/')
 @auth.oidc_auth
