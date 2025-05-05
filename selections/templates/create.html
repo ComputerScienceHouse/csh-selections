@@ -4,7 +4,7 @@
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title">Add Application</h3>
-                <form action="/application" method="post" id="evals-create-application">
+                <form action="/application" method="post" enctype="multipart/form-data" id="evals-create-application">
                     <input type="text" class="form-control" placeholder="Application ID" name="rit_id"></input> <br>
                     <textarea class="form-control" placeholder="Application Text" name="application"
                               rows="10"></textarea>
@@ -16,6 +16,7 @@
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                     </select>
+                    <input name="file" type="file" form="evals-create-application" accept=".pdf">
                     <div style="text-align:center; padding-top: 30px;">
                         <input type="submit" class="btn btn-primary" value="Submit">
                     </div>
