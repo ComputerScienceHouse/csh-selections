@@ -41,6 +41,13 @@ from selections.blueprints.teams import *
 
 from selections.utils import before_request
 
+import boto3
+session = boto3.Session(
+    aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'],
+)
+s3 = session.resource('s3')
+bucket = s3.meta.client
 
 @app.route('/')
 @auth.oidc_auth

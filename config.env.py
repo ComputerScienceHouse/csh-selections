@@ -24,8 +24,15 @@ OIDC_CLIENT_CONFIG = {
     'post_logout_redirect_uris': [env.get('OIDC_LOGOUT_REDIRECT_URI', 'https://profiles.csh.rit.edu/logout')]
 }
 
+#LDAP SHIII
 LDAP_BIND_DN = env.get("LDAP_BIND_DN", default="cn=selections2,ou=Apps,dc=csh,dc=rit,dc=edu")
 LDAP_BIND_PASS = env.get("LDAP_BIND_PASS", default=None)
+
+#S3 Stuff
+AWS_ACCESS_KEY_ID = env.get("AWS_ACCESS_KEY_ID", '')
+AWS_SECRET_ACCESS_KEY = env.get("AWS_SECRET_ACCESS_KEY", '')
+S3_BUCKET_NAME = env.get("S3_BUCKET_NAME", '')
+
 
 # Sentry Config
 SENTRY_DSN = env.get("SENTRY_DSN", "")

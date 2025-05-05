@@ -1,12 +1,12 @@
 from collections import defaultdict
 from zipfile import BadZipFile
 
-import docx
 from flask import render_template, redirect, url_for, flash, request
 
 from selections.utils import before_request, assign_pending_applicants
-from selections import app, auth
+from selections import app, auth, bucket
 from selections.models import Applicant, Criteria, db, Members, Submission
+
 
 
 @app.route('/application/<app_id>')
@@ -28,6 +28,7 @@ def get_application(app_id, info=None):
 
     split_body = applicant_info.body.split('\n')
     fields = Criteria.query.filter_by(medium='Paper').all()
+    print(info) #TODO: REMOVE TEMP DEBUG
     return render_template(
         'vote.html',
         application=applicant_info,
@@ -46,6 +47,9 @@ def create_application():
         gender=request.form.get('gender'),
         rit_id=applicant_rit_id,
     )
+    pdf = request.files['file']
+    print(pdf)
+    #bucket.upload_file()
     db.session.add(applicant)
     db.session.flush()
     db.session.commit()

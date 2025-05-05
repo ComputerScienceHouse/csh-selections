@@ -12,16 +12,20 @@ from selections.models import Applicant, Members
 def before_request(func):
     @wraps(func)
     def wrapped_function(*args, **kwargs):
-        git_revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').rstrip()
-        uuid = str(session['userinfo'].get('sub', ''))
-        uid = str(session['userinfo'].get('preferred_username', ''))
+        git_revision = (
+            subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+            .decode("utf-8")
+            .rstrip()
+        )
+        uuid = str(session["userinfo"].get("sub", ""))
+        uid = str(session["userinfo"].get("preferred_username", ""))
         info = {
-            'git_revision': git_revision,
-            'uuid': uuid,
-            'uid': uid,
-            'group_list': session['userinfo'].get('groups', []),
+            "git_revision": git_revision,
+            "uuid": uuid,
+            "uid": uid,
+            "group_list": session["userinfo"].get("groups", []),
         }
-        kwargs['info'] = info
+        kwargs["info"] = info
         return func(*args, **kwargs)
 
     return wrapped_function
@@ -34,7 +38,7 @@ def assign_pending_applicants():
     if None in teams:
         teams.remove(None)
 
-    apps_per_team = ceil(len(pending)/len(teams))
+    apps_per_team = ceil(len(pending) / len(teams))
 
     div_apps = list(zip_longest(*(iter(pending),) * apps_per_team))
 
