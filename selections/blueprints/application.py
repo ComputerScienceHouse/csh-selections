@@ -54,7 +54,7 @@ def create_application():
 
 @app.route('/application/import', methods=['POST'])
 @auth.oidc_auth
-@before_request
+#@before_request
 def import_application():
     word_file = request.files['file']
     if not word_file:
