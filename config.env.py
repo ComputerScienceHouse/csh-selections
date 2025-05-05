@@ -32,6 +32,7 @@ LDAP_BIND_PASS = env.get("LDAP_BIND_PASS", default=None)
 AWS_ACCESS_KEY_ID = env.get("AWS_ACCESS_KEY_ID", '')
 AWS_SECRET_ACCESS_KEY = env.get("AWS_SECRET_ACCESS_KEY", '')
 S3_BUCKET_NAME = env.get("S3_BUCKET_NAME", '')
+S3_URL = env.get("S3_URL", '')
 
 
 # Sentry Config

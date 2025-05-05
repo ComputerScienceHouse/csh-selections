@@ -41,7 +41,7 @@ session = boto3.Session(
     aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
     aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'],
 )
-s3 = session.resource('s3').meta.client
+s3 = session.resource(service_name='s3', endpoint_url=app.config['S3_URL']).meta.client
 
 # Load Applications Blueprint
 from selections.blueprints.application import *
