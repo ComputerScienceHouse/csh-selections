@@ -40,6 +40,7 @@ def get_application(app_id, info=None):
 @app.route('/application', methods=['POST'])
 @auth.oidc_auth
 def create_application():
+    print(request.form)
     applicant_rit_id = request.form.get('rit_id')
     applicant = Applicant(
         body=request.form.get('application'),
