@@ -42,6 +42,10 @@ session = boto3.Session(
     aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'],
 )
 s3 = session.resource(service_name='s3', endpoint_url=app.config['S3_URL']).meta.client
+try:
+    s3.create_bucket(Bucket='selections')
+except BucketAlreadyExists:
+    continue
 
 # Load Applications Blueprint
 from selections.blueprints.application import *
