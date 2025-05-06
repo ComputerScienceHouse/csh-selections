@@ -198,15 +198,13 @@ def submit_application(app_id, info=None):
 def review_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
     evaluated = bool(Submission.query.filter_by(application=app_id, medium='Phone').all())
-    scores = Submission.query.filter_by(application=app_id).all()
-    pdf_url = s3.generate_presigned_url('get_object', Params={'Bucket': app.config['S3_BUCKET_NAME'], 'Key': applicant_info.rit_id+'.pdf'}, ExpiresIn=30)
-    pdf_url = pdf_url.replace("s3.csh", "assets.csh")
+    scores = Submission.query.filter_by(application=app_id).all() 
     return render_template(
         'review_app.html',
         info=info,
         application=applicant_info,
         scores=scores,
-        pdf_url=pdf_url,
+        pdf_url='/application/content'+app_id,
         evaluated=evaluated)
 
 
