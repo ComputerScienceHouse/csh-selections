@@ -1,8 +1,5 @@
 
-// atob() is used to convert base64 encoded PDF to binary-like data.
-// (See also https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/
-// Base64_encoding_and_decoding.)
-
+function pleaseWork() {
 // Loaded via <script> tag, create shortcut to access PDF.js exports.
 var { pdfjsLib } = globalThis.pdfjsLib;
 
@@ -42,3 +39,6 @@ loadingTask.promise.then(function (pdf) {
     // PDF loading error
     console.error(reason);
 });
+}
+
+document.getElementById('body').addEventListener('load', pleaseWork)
