@@ -9,6 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+import boto3
 
 # Create the initial Flask Object
 app = Flask(__name__)
@@ -36,7 +37,6 @@ from selections.models import *
 migrate = Migrate(app, db)
 
 #initialize S3
-import boto3
 session = boto3.Session(
     aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
     aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'],

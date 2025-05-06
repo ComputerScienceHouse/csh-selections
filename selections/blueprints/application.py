@@ -71,11 +71,7 @@ def import_application():
 
     old_apps = [app.id for app in Applicant.query.all()]
 
-    try:
-        document = docx.Document(word_file)
-    except BadZipFile:
-        return 'Not a valid Word file!'
-
+    document = ""
     iteration = 0
 
     for paragraph in document.paragraphs:
