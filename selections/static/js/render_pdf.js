@@ -41,4 +41,8 @@ loadingTask.promise.then(function (pdf) {
 });
 }
 
-document.getElementsByName('body')[0].addEventListener('load', pleaseWork)
+document.onreadystatechange = function () {
+    if (document.readyState == "complete") {
+      pleaseWork()
+    }
+  }
