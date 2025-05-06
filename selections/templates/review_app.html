@@ -24,7 +24,7 @@
                 <h6 class="card-subtitle mb-2 text-muted">RIT ID: {{ application.rit_id }}</h6>
                 <!--<h6 class="card-subtitle mb-2 text-muted">Gender: {{ application.gender }}</h6>-->
                 <h6 class="card-subtitle mb-2 text-muted">Team: {{ application.team }}</h6>
-                <embed data="{{pdf_url}}" type="application/pdf" width="100%" height="80%">
+                <embed src="{{pdf_url}}" type="application/pdf" width="100%" height="80%">
             </div>
         </div>
         {% for score in scores %}
