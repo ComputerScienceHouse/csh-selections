@@ -4,7 +4,7 @@
 // Base64_encoding_and_decoding.)
 
 // Loaded via <script> tag, create shortcut to access PDF.js exports.
-var { pdfjsLib } = globalThis;
+var { pdfjsLib } = globalThis.pdfjsLib;
 
 // The workerSrc property shall be specified.
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
