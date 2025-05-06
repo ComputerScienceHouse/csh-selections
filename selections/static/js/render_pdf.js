@@ -41,4 +41,4 @@ loadingTask.promise.then(function (pdf) {
 });
 }
 
-document.getElementById('body').addEventListener('load', pleaseWork)
+document.getElementsByName('body')[0].addEventListener('load', pleaseWork)
