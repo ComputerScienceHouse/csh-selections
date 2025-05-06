@@ -193,13 +193,13 @@ def review_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
     evaluated = bool(Submission.query.filter_by(application=app_id, medium='Phone').all())
     scores = Submission.query.filter_by(application=app_id).all()
-    split_body = applicant_info.body.split('\n')
+    pdf_url = s3.generate_presigned_url('get_object', Params={'Bucket': app.config['S3_BUCKET_NAME'], 'Key': applicant_info.rit_id+'.pdf'}, ExpiresIn=30)
     return render_template(
         'review_app.html',
         info=info,
         application=applicant_info,
         scores=scores,
-        split_body=split_body,
+        pdf_url=pdf_url,
         evaluated=evaluated)
 
 
