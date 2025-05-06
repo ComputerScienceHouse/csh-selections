@@ -26,13 +26,11 @@ def get_application(app_id, info=None):
         flash('You already reviewed that application!')
         return redirect(url_for('main'))
 
-    split_body = applicant_info.body.split('\n')
-    fields = Criteria.query.filter_by(medium='Paper').all()
-    print(info) #TODO: REMOVE TEMP DEBUG
+    pdf_url = s3.generate_presigned_url('get_object', Params={'Bucket': app.config['S3_BUCKET_NAME'], 'Key': applicant_info.rit_id+'.pdf'}, ExpiresIn=30)
     return render_template(
         'vote.html',
         application=applicant_info,
-        split_body=split_body,
+        pdf_url=pdf_url,
         info=info,
         fields=fields)
 
