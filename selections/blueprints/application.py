@@ -28,7 +28,7 @@ def get_application(app_id, info=None):
     return render_template(
         'vote.html',
         application=applicant_info,
-        pdf_url='/application/content'+app_id,
+        pdf_url='/application/content/'+app_id,
         info=info,
         fields=fields)
 
@@ -204,7 +204,7 @@ def review_application(app_id, info=None):
         info=info,
         application=applicant_info,
         scores=scores,
-        pdf_url='/application/content'+app_id,
+        pdf_url='/application/content/'+app_id,
         evaluated=evaluated)
 
 
