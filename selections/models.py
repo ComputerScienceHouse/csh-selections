@@ -11,7 +11,7 @@ class Applicant(db.Model):
     __tablename__ = 'application'
     id = Column(Integer, primary_key=True)
     created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    body = Column(String(6000), nullable=False)
+    body = Column(String(6000), nullable=True)
     team = Column(Integer, nullable=False)
     gender = Column(String(15), nullable=False)
     phone_int = Column(Boolean, server_default='0', nullable=False)
