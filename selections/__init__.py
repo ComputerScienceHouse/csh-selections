@@ -44,7 +44,7 @@ session = boto3.Session(
 s3 = session.resource(service_name='s3', endpoint_url=app.config['S3_URL']).meta.client
 try:
     s3.create_bucket(Bucket=app.config['S3_BUCKET_NAME'])
-except BucketAlreadyExists:
+except s3.exceptions.BucketAlreadyExists:
     1+1
 
 # Load Applications Blueprint

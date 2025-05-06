@@ -13,19 +13,19 @@ def before_request(func):
     @wraps(func)
     def wrapped_function(*args, **kwargs):
         git_revision = (
-            subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
-            .decode("utf-8")
+            subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])
+            .decode('utf-8')
             .rstrip()
         )
-        uuid = str(session["userinfo"].get("sub", ""))
-        uid = str(session["userinfo"].get("preferred_username", ""))
+        uuid = str(session['userinfo'].get('sub', ''))
+        uid = str(session['userinfo'].get('preferred_username', ''))
         info = {
-            "git_revision": git_revision,
-            "uuid": uuid,
-            "uid": uid,
-            "group_list": session["userinfo"].get("groups", []),
+            'git_revision': git_revision,
+            'uuid': uuid,
+            'uid': uid,
+            'group_list': session['userinfo'].get('groups', []),
         }
-        kwargs["info"] = info
+        kwargs['info'] = info
         return func(*args, **kwargs)
 
     return wrapped_function
