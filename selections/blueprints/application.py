@@ -208,7 +208,8 @@ def review_application(app_id, info=None):
 @before_request
 def get_phone_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
-    split_body = applicant_info.body.split('\n')
+    pdf_url = s3.generate_presigned_url('get_object', Params={'Bucket': app.config['S3_BUCKET_NAME'], 'Key': applicant_info.rit_id+'.pdf'}, ExpiresIn=30)
+    pdf_url = pdf_url.replace("s3.csh", "assets.csh")
     scores = [subs.score for subs in Submission.query.filter_by(application=app_id).all()]
     total = 0
     if scores:
@@ -222,7 +223,7 @@ def get_phone_application(app_id, info=None):
             info=info,
             app_score=total,
             application=applicant_info,
-            split_body=split_body)
+            pdf_url=pdf_url)
 
 
 @app.route('/application/phone/<app_id>', methods=['POST'])
