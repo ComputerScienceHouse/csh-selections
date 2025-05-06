@@ -8,7 +8,6 @@ from selections import app, auth, s3
 from selections.models import Applicant, Criteria, db, Members, Submission
 
 
-
 @app.route('/application/<app_id>')
 @auth.oidc_auth
 @before_request
@@ -26,13 +25,20 @@ def get_application(app_id, info=None):
         flash('You already reviewed that application!')
         return redirect(url_for('main'))
 
-    pdf_url = s3.generate_presigned_url('get_object', Params={'Bucket': app.config['S3_BUCKET_NAME'], 'Key': applicant_info.rit_id+'.pdf'}, ExpiresIn=30)
     return render_template(
         'vote.html',
         application=applicant_info,
-        pdf_url=pdf_url,
+        pdf_url='/application/content'+app_id,
         info=info,
         fields=fields)
+
+@app.route('/application/content/<app_id>')
+@auth.oidc_auth
+def get_application_pdf(app_id):
+    applicant_info = Applicant.query.filter_by(id=app_id).first()
+    resp = s3.get_object(Bucket=app.config['S3_BUCKET_NAME'], Key='/'+applicant_info.rit_id+'.pdf')
+    pdfdata = resp.read()
+    return pdfdata
 
 
 @app.route('/application', methods=['POST'])
