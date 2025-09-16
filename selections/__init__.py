@@ -5,6 +5,7 @@ from collections import defaultdict
 from flask import Flask
 from flask_migrate import Migrate
 from flask_pyoidc.flask_pyoidc import OIDCAuthentication
+from flask_pyoidc.provider_configuration import ProviderConfiguration, ClientMetadata
 from flask_sqlalchemy import SQLAlchemy
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
@@ -20,8 +21,12 @@ if os.path.exists(os.path.join(os.getcwd(), 'config.py')):
 else:
     app.config.from_pyfile(os.path.join(os.getcwd(), 'config.env.py'))
 
-auth = OIDCAuthentication(app, issuer=app.config['OIDC_ISSUER'],
-                          client_registration_info=app.config['OIDC_CLIENT_CONFIG'])
+    #auth = OIDCAuthentication(app, issuer=app.config['OIDC_ISSUER'],
+    #                      client_registration_info=app.config['OIDC_CLIENT_CONFIG'])
+
+client_metadata = ClientMetadata(app.config["OIDC_CLIENT_CONFIG"])
+provider_config = ProviderConfiguration(issuer=app.config["OIDC_ISSUER"], client_registration_info=client_metadata)
+auth = OIDCAuthentication({'default': provider_config}, app)
 
 # Sentry
 sentry_sdk.init(
@@ -55,7 +60,7 @@ from selections.utils import before_request
 
 
 @app.route('/')
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def main(info=None):
     is_evals = '/eboard-evaluations' in info['group_list']

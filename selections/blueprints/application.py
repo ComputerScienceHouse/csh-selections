@@ -9,7 +9,7 @@ from selections.models import Applicant, Criteria, db, Members, Submission
 
 
 @app.route('/application/<app_id>')
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def get_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
@@ -33,7 +33,7 @@ def get_application(app_id, info=None):
         fields=fields)
 
 @app.route('/application/content/<app_id>')
-@auth.oidc_auth
+@auth.oidc_auth("default")
 def get_application_pdf(app_id):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
     resp = s3.get_object(Bucket=app.config['S3_BUCKET_NAME'], Key='/'+applicant_info.rit_id+'.pdf')
@@ -42,7 +42,7 @@ def get_application_pdf(app_id):
 
 
 @app.route('/application', methods=['POST'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 def create_application():
     applicant_rit_id = request.form.get('rit_id')
     applicant = Applicant(
@@ -60,7 +60,7 @@ def create_application():
 
 
 @app.route('/application/import', methods=['POST'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 #@before_request
 def import_application():
     word_file = request.files['file']
@@ -115,7 +115,7 @@ def import_application():
 
 
 @app.route('/application/delete/<app_id>', methods=['GET'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def delete_application(app_id, info=None):
     is_evals = '/eboard-evaluations' in info['group_list']
@@ -136,7 +136,7 @@ def delete_application(app_id, info=None):
 
 
 @app.route('/application/create')
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def get_application_creation(info=None):
     is_evals = '/eboard-evaluations' in info['group_list']
@@ -149,7 +149,7 @@ def get_application_creation(info=None):
 
 
 @app.route('/application/<app_id>', methods=['POST'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def submit_application(app_id, info=None):
     member = Members.query.filter_by(username=info['uid']).first()
@@ -193,12 +193,12 @@ def submit_application(app_id, info=None):
 
 
 @app.route('/application/review/<app_id>', methods=['GET'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def review_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
     evaluated = bool(Submission.query.filter_by(application=app_id, medium='Phone').all())
-    scores = Submission.query.filter_by(application=app_id).all() 
+    scores = Submission.query.filter_by(application=app_id).all()
     return render_template(
         'review_app.html',
         info=info,
@@ -209,7 +209,7 @@ def review_application(app_id, info=None):
 
 
 @app.route('/application/phone/<app_id>', methods=['GET'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def get_phone_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
@@ -232,7 +232,7 @@ def get_phone_application(app_id, info=None):
 
 
 @app.route('/application/phone/<app_id>', methods=['POST'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def promote_application(app_id, info=None):
     score = request.form.get('score')

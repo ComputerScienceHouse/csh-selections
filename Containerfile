@@ -1,4 +1,4 @@
-FROM docker.io/python:3.9-bookworm
+FROM docker.io/python:3.13-bookworm
 
 WORKDIR /src/
 COPY ./ .
