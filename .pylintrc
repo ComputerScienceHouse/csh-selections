@@ -1,7 +1,6 @@
 [MASTER]
 ignore = ,input
 persistent = yes
-load-plugins = pylint_quotes
 
 [MESSAGES CONTROL]
 disable =
@@ -10,7 +9,6 @@ disable =
 	duplicate-code,
 	no-member,
 	parse-error,
-	bad-continuation,
 	too-few-public-methods,
 	global-statement,
 	cyclic-import,

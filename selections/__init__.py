@@ -50,7 +50,7 @@ s3 = session.resource(service_name='s3', endpoint_url=app.config['S3_URL']).meta
 try:
     s3.create_bucket(Bucket=app.config['S3_BUCKET_NAME'])
 except s3.exceptions.BucketAlreadyExists:
-    1+1
+    pass
 
 # Load Applications Blueprint
 from selections.blueprints.application import *

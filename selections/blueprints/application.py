@@ -1,5 +1,4 @@
 from collections import defaultdict
-from zipfile import BadZipFile
 
 from flask import render_template, redirect, url_for, flash, request
 
@@ -97,7 +96,7 @@ def import_application():
             if line[-1:] == ' ':
                 app_text += line
             else:
-                app_text += '\n{}'.format(line)
+                app_text += f'\n{line}'
 
         applications[app_rit_id] = [app_gender, app_text]
         new_app = Applicant(
@@ -188,7 +187,7 @@ def submit_application(app_id, info=None):
     db.session.add(member_score)
     db.session.flush()
     db.session.commit()
-    flash('Thanks for evaluating application #{}!'.format(app_id))
+    flash(f'Thanks for evaluating application #{app_id}!')
     return redirect('/', 302)
 
 
@@ -213,7 +212,8 @@ def review_application(app_id, info=None):
 @before_request
 def get_phone_application(app_id, info=None):
     applicant_info = Applicant.query.filter_by(id=app_id).first()
-    pdf_url = s3.generate_presigned_url('get_object', Params={'Bucket': app.config['S3_BUCKET_NAME'], 'Key': applicant_info.rit_id+'.pdf'}, ExpiresIn=30)
+    pdf_url = s3.generate_presigned_url('get_object', Params={'Bucket': app.config['S3_BUCKET_NAME'],
+                                                            'Key': applicant_info.rit_id+'.pdf'}, ExpiresIn=30)
     pdf_url = pdf_url.replace("s3.csh", "assets.csh")
     scores = [subs.score for subs in Submission.query.filter_by(application=app_id).all()]
     total = 0
