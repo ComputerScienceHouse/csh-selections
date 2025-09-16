@@ -6,7 +6,7 @@ from selections.models import Members
 
 
 @app.route('/teams')
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def get_teams(info=None):
     is_evals = '/eboard-evaluations' in info['group_list']
@@ -34,7 +34,7 @@ def get_teams(info=None):
 
 
 @app.route('/teams', methods=['POST'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def create_team(info=None):
     is_evals = '/eboard-evaluations' in info['group_list']
@@ -69,7 +69,7 @@ def create_team(info=None):
 
 
 @app.route('/teams/<team_id>', methods=['POST'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def add_to_team(team_id, info=None):
     is_evals = '/eboard-evaluations' in info['group_list']
@@ -102,7 +102,7 @@ def add_to_team(team_id, info=None):
 
 
 @app.route('/teams/remove/<username>', methods=['GET'])
-@auth.oidc_auth
+@auth.oidc_auth("default")
 @before_request
 def remove_from_team(username, info=None):
     is_evals = '/eboard-evaluations' in info['group_list']
