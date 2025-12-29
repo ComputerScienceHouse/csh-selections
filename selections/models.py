@@ -10,7 +10,7 @@ interview_enum = Enum('Paper', 'Phone', name='interview_enum')
 class Applicant(db.Model):
     __tablename__ = 'application'
     id = Column(Integer, primary_key=True)
-    created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False) #pylint: disable=not-callable
     body = Column(String(6000), nullable=True)
     team = Column(Integer, nullable=False)
     gender = Column(String(15), nullable=False)
@@ -26,7 +26,7 @@ class Members(db.Model):
 
 class Submission(db.Model):
     id = Column(Integer, primary_key=True)
-    created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False) #pylint: disable=not-callable
     application = Column(Integer, ForeignKey('application.id'), nullable=False)
     member = Column(String(50), ForeignKey('members.username'), nullable=False)
     medium = Column(interview_enum, primary_key=True)

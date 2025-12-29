@@ -28,8 +28,7 @@ def get_application(app_id, info=None):
         'vote.html',
         application=applicant_info,
         pdf_url='/application/content/'+app_id,
-        info=info,
-        fields=fields)
+        info=info)
 
 @app.route('/application/content/<app_id>')
 @auth.oidc_auth("default")
