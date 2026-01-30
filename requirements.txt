@@ -3,7 +3,7 @@ alembic==1.16.5
 astroid==3.3.11
 Beaker==1.13.0
 blinker==1.9.0
-certifi==2025.8.3
+certifi==2026.1.4
 cffi==2.0.0
 chardet==5.2.0
 click==8.2.1
