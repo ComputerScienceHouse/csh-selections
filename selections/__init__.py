@@ -102,7 +102,6 @@ def main(info=None):
         applications = [
                 {
                     'id': a.id,
-                    'gender': a.gender,
                     'reviewed': a.id in reviewed_apps,
                     'interview': a.phone_int,
                     'review_count': Submission.query.filter_by(application=a.id).count(),

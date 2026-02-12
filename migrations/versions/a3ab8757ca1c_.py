@@ -22,7 +22,6 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('body', sa.String(length=5000), nullable=True),
     sa.Column('team', sa.Integer(), nullable=True),
-    sa.Column('gender', sa.Enum('Male', 'Female', 'Other', name='gender_enum'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('criteria',

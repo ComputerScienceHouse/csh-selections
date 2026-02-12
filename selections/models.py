@@ -3,7 +3,6 @@ from sqlalchemy.sql import func
 
 from selections import db
 
-#gender_enum = Enum('Male', 'Female', 'Other', name='gender_enum')
 interview_enum = Enum('Paper', 'Phone', name='interview_enum')
 
 
@@ -13,7 +12,6 @@ class Applicant(db.Model):
     created = Column(DateTime(timezone=True), server_default=func.now(), nullable=False) #pylint: disable=not-callable
     body = Column(String(6000), nullable=True)
     team = Column(Integer, nullable=False)
-    gender = Column(String(15), nullable=False)
     phone_int = Column(Boolean, server_default='0', nullable=False)
     rit_id = Column(String(20), nullable=False)
 

@@ -22,9 +22,6 @@ def upgrade():
     op.alter_column('application', 'body',
                existing_type=mysql.VARCHAR(length=6000),
                nullable=False)
-    op.alter_column('application', 'gender',
-               existing_type=mysql.ENUM('Male', 'Female', 'Other'),
-               nullable=False)
     op.alter_column('application', 'team',
                existing_type=mysql.INTEGER(display_width=11),
                nullable=False)
@@ -91,9 +88,6 @@ def downgrade():
                nullable=True)
     op.alter_column('application', 'team',
                existing_type=mysql.INTEGER(display_width=11),
-               nullable=True)
-    op.alter_column('application', 'gender',
-               existing_type=mysql.ENUM('Male', 'Female', 'Other'),
                nullable=True)
     op.alter_column('application', 'body',
                existing_type=mysql.VARCHAR(length=6000),

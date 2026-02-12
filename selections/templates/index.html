@@ -40,7 +40,6 @@
                         <tr>
                             <th scope="col">ID</th>
                             <th scope="col">RIT ID</th>
-                            <!-- <th scope="col">Gender</th> -->
                         </tr>
                         </thead>
                         <tbody>
@@ -53,7 +52,6 @@
                                         </a>
                                     </th>
                                     <td>{{ person.rit_id }}</td>
-                                    <td>{{ person.gender }}</td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -73,7 +71,6 @@
                         <tr>
                             <th>ID</th>
                             <th>RIT ID</th>
-                            <!--<th>Gender</th>-->
                             <th>Reviewers</th>
                             <th>Interview</th>
                             <th>Score</th>
@@ -86,7 +83,6 @@
                                     <a href="/application/review/{{ application.id }}"><i
                                             class="fas fa-clipboard-check"></i> {{ application.id }}</a></th>
                                 <td>{{ application.rit_id }}</td>
-                                <!--<td>{{ application.gender }}</td>-->
                                 <td>
                                     {% for member in reviewers[application.id] %}
                                         <img width="25" height="25" class="img-circle"
