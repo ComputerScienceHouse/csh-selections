@@ -1,6 +1,6 @@
-config.py
-selections/.idea
-selections/__pycache__
-venv
-selections/__init__.pyc
-selections/ldap.pyc
+.env
+
+.idea/
+.vscode/
+
+CLAUDE.md

@@ -10,8 +10,8 @@ Go into OKD and set the replicas on the prod deployment to 0. This will ensure s
 
 ## Back up and prep Mysql
 The following steps will create an archive of the current selections db, and prep the db for a new year
-1. Rename `selections_skyler` to `selections_<last year>`
-2. Copy the structure of the table back to `selections_skyler`
+1. Rename `selections` to `selections_<last year>`
+2. Copy the structure of the table back to `selections`
 3. (optional) Reset the auto increments to 1
 4. Copy the criteria
 
