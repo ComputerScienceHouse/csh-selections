@@ -1,0 +1,4 @@
+singleAttributePerLine: true
+objectWrap: collapse
+tabWidth: 4
+tabs: false
