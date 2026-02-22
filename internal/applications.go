@@ -1,37 +1,72 @@
 package internal
 
 import (
-	"fmt"
+	"context"
+	"log"
+	"mime/multipart"
+	"net/http"
 
-	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type Application struct {
-	Id uuid.UUID
+	ID      uuid.UUID `gorm:"primarykey"`
+	Ratings []Rating
+}
+
+type Rating struct {
+	ID     uuid.UUID `gorm:"primarykey"`
+	Member string    `gorm:"primarykey"`
+	Score  int
 }
 
 /* ==============
 ACTUAL FUNCTIONS GO HERE
 			============= */
 
-func uploadApplication() Application {
-	//TODO: S3 upload here
-
-	return Application{}
+func uploadApplication(file multipart.File) Application {
+	app := Application{ID: uuid.New()}
+	db.Create(&app)
+	_, err := s3client.PutObject(context.Background(), &s3.PutObjectInput{
+		Bucket: aws.String(env.BucketName),
+		Key:    aws.String(app.ID.String()),
+		Body:   file,
+	})
+	if err != nil {
+		log.Println("Failed while uploading application", err)
+	}
+	return app
 }
 
 func (app Application) get() {
 
 }
 
-func HandleApplicationUpload(c *gin.Context) {
-	file, err := c.FormFile("applicationFile")
-	if err != nil {
-		fmt.Println("sad")
-	}
-	_, _ = file.Open()
+/* ============
+WEB FUNCTIONS GO HERE
+		  ============ */
 
+// GET Request
+func HandleApplicationUploadPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "upload_application.tmpl", templateHeaders(c))
+
+}
+
+// POST Request
+func HandleApplicationFileUpload(c *gin.Context) {
+	fileH, err := c.FormFile("applicationFile")
+	if err != nil {
+		log.Println("Something went wrong with the application upload.\n\t", err)
+	}
+	file, err := fileH.Open()
+	if err != nil {
+		log.Println("Failed to get file from application upload", err)
+	}
+	uploadApplication(file)
+
+	//TODO: display status of upload?
+	HandleApplicationUploadPage(c)
 }
