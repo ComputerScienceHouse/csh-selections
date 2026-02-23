@@ -1,0 +1,36 @@
+{{ template "header.tmpl" . }}
+<h1>Selections is currently <strong>{{ if .SessionState }}ACTIVE{{ else }}INACTIVE{{ end }}</strong>.</h1>
+<form method="post" action="/session/manage">
+    <!--TODO: add confirm modal-->
+    <button class="btn btn-danger btn-large" id="state" name="state"
+            value="{{ if .SessionState }}stop{{ else }}start{{ end }}"
+            type="submit">{{ if .SessionState }}STOP{{ else }}START{{ end }} SESSION
+    </button>
+</form>
+{{ if not .SessionState }}
+    <div class="card p-2 mt-2">
+        <h2>Add Members to this Selections Session</h2>
+        <form class="card-body" method="post" action="/session/addMembers">
+            <div class="mb-3">
+                <label for="membersSelect" class="control-label">Members</label>
+                <input type="text" name="membersSelect" id="membersSelect" class="form-control"
+                       data-module="memberSelect">
+            </div>
+            <button class="btn btn-primary" type="submit">Add Members</button>
+        </form>
+    </div>
+{{ end }}
+<link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"
+        integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+/>
+<script
+        src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"
+        integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+></script>
+{{ template "footer.tmpl" . }}

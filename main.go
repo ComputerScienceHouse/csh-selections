@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-
 	loadenv "github.com/caarlos0/env/v11"
 	cshAuth "github.com/computersciencehouse/csh-auth"
 	. "github.com/computersciencehouse/selections/internal"
@@ -33,14 +31,12 @@ func main() {
 	router.GET("/auth/login", auth.AuthRequest)
 	router.GET("/auth/callback", auth.AuthCallback)
 	router.GET("/auth/logout", auth.AuthLogout)
-	router.GET("/", auth.AuthWrapper(func(c *gin.Context) {
-		cl, _ := c.Get("cshauth")
-		user := cl.(cshAuth.CSHClaims).UserInfo
-		c.HTML(http.StatusOK, "homepage.tmpl", gin.H{"Username": user.Username})
-	}))
+	router.GET("/", auth.AuthWrapper(HandleSessionHomePage))
 	router.GET("/application/upload", auth.AuthWrapper(HandleApplicationUploadPage))
 	router.POST("/application/upload", auth.AuthWrapper(HandleApplicationFileUpload))
 	router.GET("/session/manage", auth.AuthWrapper(HandleSessionManagementPage))
+	router.POST("/session/manage", auth.AuthWrapper(HandleSessionChanging))
+	router.GET("/session/allMembers", auth.AuthWrapper(HandleSessionMemberList))
 
 	router.Run()
 }

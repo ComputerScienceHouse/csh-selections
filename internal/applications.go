@@ -5,6 +5,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -18,9 +19,10 @@ type Application struct {
 }
 
 type Rating struct {
-	ID     uuid.UUID `gorm:"primarykey"`
-	Member string    `gorm:"primarykey"`
-	Score  int
+	ApplicationID uuid.UUID `gorm:"primarykey"`
+	Member        string    `gorm:"primarykey"`
+	SubmittedTime time.Time
+	Score         int
 }
 
 /* ==============
@@ -51,7 +53,7 @@ WEB FUNCTIONS GO HERE
 
 // GET Request
 func HandleApplicationUploadPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "upload_application.tmpl", templateHeaders(c))
+	c.HTML(http.StatusOK, "uploadApplication.tmpl", templateHeaders(c))
 
 }
 
