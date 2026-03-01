@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	loadenv "github.com/caarlos0/env/v11"
 	cshAuth "github.com/computersciencehouse/csh-auth"
 	. "github.com/computersciencehouse/selections/internal"
@@ -27,6 +29,7 @@ func main() {
 
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
+	router.StaticFS("/static", http.Dir("static"))
 	//Define routes here
 	router.GET("/auth/login", auth.AuthRequest)
 	router.GET("/auth/callback", auth.AuthCallback)
@@ -36,7 +39,9 @@ func main() {
 	router.POST("/application/upload", auth.AuthWrapper(HandleApplicationFileUpload))
 	router.GET("/session/manage", auth.AuthWrapper(HandleSessionManagementPage))
 	router.POST("/session/manage", auth.AuthWrapper(HandleSessionChanging))
-	router.GET("/session/allMembers", auth.AuthWrapper(HandleSessionMemberList))
+	router.GET("/session/allMembers", auth.AuthWrapper(HandleSessionEligibleMemberList))
+	router.POST("/session/addMembers", auth.AuthWrapper(HandleSessionAddMembers))
+	router.POST("/session/createTeams", auth.AuthWrapper(HandleTeamCreation))
 
-	router.Run()
+	router.Run("localhost:8080")
 }

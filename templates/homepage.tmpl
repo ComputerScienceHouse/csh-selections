@@ -1,7 +1,7 @@
 {{ template "header.tmpl" . }}
 <h1>This Selections session is <strong>{{ if .SessionState }}ACTIVE{{ else }}INACTIVE{{ end }}</strong>.</h1>
 {{ if not .SessionState }}
-    <h2>You're {{ if not .OnATeam }}<strong>not</strong> {{ end }}in this Selections session.</h2>
+    <h2>You're {{ if not .IsAttending }}<strong>not</strong> {{ end }}in this Selections session.</h2>
 {{ end }}
 <div class="container">
     <div class="row">

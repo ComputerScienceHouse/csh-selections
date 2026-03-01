@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var db *gorm.DB
@@ -15,9 +16,11 @@ var s3client *s3.Client
 var oidcClient OIDCClient
 
 func InitData() {
-	selectionsDb, err := gorm.Open(postgres.Open(env.DatabaseUri), &gorm.Config{})
+	selectionsDb, err := gorm.Open(postgres.Open(env.DatabaseUri), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
-		log.Println("Couldn't open connection to database:", err)
+		log.Fatalln("Couldn't open connection to database:", err)
 		return
 	}
 	db = selectionsDb
@@ -33,12 +36,22 @@ func InitData() {
 	}
 	err = db.AutoMigrate(&Membership{})
 	if err != nil {
-		log.Println("Couldn't migrate Team table:", err)
+		log.Println("Couldn't migrate Membership table:", err)
 		return
 	}
 	err = db.AutoMigrate(&SessionState{})
 	if err != nil {
 		log.Println("Couldn't migrate SessionState table:", err)
+		return
+	}
+	err = db.AutoMigrate(&Rating{})
+	if err != nil {
+		log.Println("Couldn't migrate Rating table:", err)
+		return
+	}
+	err = db.AutoMigrate(&SessionAttendance{})
+	if err != nil {
+		log.Println("Couldn't migrate Rating table:", err)
 		return
 	}
 

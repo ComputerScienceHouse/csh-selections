@@ -1,12 +1,19 @@
 package internal
 
 import (
+	"fmt"
+	"log"
+	"math/rand"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type Team struct {
 	ID      uuid.UUID `gorm:"primarykey"`
-	members []string
+	Members []string  `gorm:"-"`
 }
 
 type Membership struct {
@@ -38,13 +45,29 @@ func (t Team) getTeamMembership() {
 	var memberships []Membership
 	db.Find(&memberships, t.ID)
 	for _, m := range memberships {
-		t.members = append(t.members, m.Member)
+		t.Members = append(t.Members, m.Member)
 	}
 }
 
 func (t Team) addMemberToTeam(member string) {
 	membership := Membership{TeamID: t.ID, Member: member}
+	t.Members = append(t.Members, member)
 	db.Save(&membership)
+}
+
+func (t Team) addMembersToTeam(members []string) {
+	for _, member := range members {
+		t.addMemberToTeam(member)
+	}
+}
+
+func getAllTeams() []Team {
+	var teams []Team
+	db.Find(&teams)
+	for _, team := range teams {
+		team.getTeamMembership()
+	}
+	return teams
 }
 
 func getTeamByID(ID uuid.UUID) Team {
@@ -54,6 +77,46 @@ func getTeamByID(ID uuid.UUID) Team {
 	return t
 }
 
+func disperseMembersToTeams(members []OIDCUser) {
+	teams := getAllTeams()
+	teamCount := len(teams)
+	rand.Shuffle(len(members), func(i, j int) {
+		members[i], members[j] = members[j], members[i]
+	})
+	for index, member := range members {
+		currentTeam := index % teamCount
+		teams[currentTeam].addMemberToTeam(member.Username)
+	}
+}
+
 /* ==============
 WEB FUNCTIONS GO HERE
 			============= */
+
+func HandleTeamCreation(c *gin.Context) {
+	if !isUserAdmin(c) {
+		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
+		return
+	}
+	teamCountRaw := c.PostForm("teamCount")
+	teamCount, err := strconv.Atoi(teamCountRaw)
+	if err != nil {
+		log.Println("Error converting teamCount to int:", err)
+		return
+	}
+	fmt.Println(teamCount)
+	teams := make([]Team, teamCount)
+	members, eboardCount := getAttendingMembers()
+	if teamCount > eboardCount {
+		log.Println("teamCount larger than eboardCount, falling back to eboardCount", eboardCount)
+		teamCount = eboardCount
+	}
+	eboard := members[0:teamCount]
+	members = members[teamCount:]
+	for i := 0; i < teamCount; i++ {
+		teams[i] = createTeam()
+		teams[i].addMemberToTeam(eboard[i].Username)
+	}
+	disperseMembersToTeams(members)
+	c.Status(200)
+}

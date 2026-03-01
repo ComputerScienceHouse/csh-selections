@@ -8,9 +8,9 @@
     </button>
 </form>
 {{ if not .SessionState }}
-    <div class="card p-2 mt-2">
-        <h2>Add Members to this Selections Session</h2>
-        <form class="card-body" method="post" action="/session/addMembers">
+    <div class="p-2 mt-4">
+        <h3>Add Members to this Selections Session</h3>
+        <form method="post" action="/session/addMembers">
             <div class="mb-3">
                 <label for="membersSelect" class="control-label">Members</label>
                 <input type="text" name="membersSelect" id="membersSelect" class="form-control"
@@ -19,7 +19,42 @@
             <button class="btn btn-primary" type="submit">Add Members</button>
         </form>
     </div>
+    {{ if .Attendance }}
+        <div class="p-2 mt-4">
+            <h3>Members currently selected:</h3>
+            {{ range .Attendance }}
+                <span class="badge align-items-center p-2 text-body bg-primary-subtle border border-primary-subtle">
+                    {{.FullName}} ({{.Username}})
+                    <a style="color: inherit; text-decoration: none" href="javascript:void(0)" tabindex="-1"
+                       title="Remove">×
+                    </a></span>
+            {{ end }}
+            <form class="mt-2" method="post" action="/session/createTeams" onsubmit="formSubmit(event)">
+                <div class="mb-2 row">
+                    <div class="col-auto">
+                        <label class="col-form-label" for="teamCount">How many Teams?</label>
+                    </div>
+                    <div class="col-auto">
+                        <input class="form-control" id="teamCount" name="teamCount" type="number" min="1"
+                               max="{{ .EBoard }}" value="{{ .EBoard }}">
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Create Teams</button>
+            </form>
+        </div>
+    {{ end }}
 {{ end }}
+<div class="p-2 mt-4">
+    <h2>Teams</h2>
+    {{ if .Teams }}
+        {{ range .Teams }}
+            <span></span>
+        {{ end }}
+    {{ else }}
+        <span>There currently aren't any teams. Add some members to the session and then create teams!</span>
+    {{ end }}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"></script>
 <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"
@@ -33,4 +68,7 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
 ></script>
+
+<script src="/static/js/sessionAutofill.js"></script>
+<script src="/static/js/postFormNoRedirect.js"></script>
 {{ template "footer.tmpl" . }}
