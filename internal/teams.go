@@ -12,8 +12,8 @@ import (
 )
 
 type Team struct {
-	ID      uuid.UUID `gorm:"primarykey"`
-	Members []string  `gorm:"-"`
+	ID      uuid.UUID  `gorm:"primarykey"`
+	Members []OIDCUser `gorm:"-"`
 }
 
 type Membership struct {
@@ -41,28 +41,32 @@ func getTeamForMember(member string) Team {
 	return team
 }
 
-func (t Team) getTeamMembership() {
+func isMemberOnTeam(member string) bool {
+	return getTeamForMember(member).ID != uuid.UUID{}
+}
+
+func (t *Team) getTeamMembership() {
 	var memberships []Membership
 	db.Find(&memberships, t.ID)
 	for _, m := range memberships {
-		t.Members = append(t.Members, m.Member)
+		t.Members = append(t.Members, *oidcClient.GetUserInfo(m.Member))
 	}
 }
 
-func (t Team) addMemberToTeam(member string) {
-	membership := Membership{TeamID: t.ID, Member: member}
+func (t *Team) addMemberToTeam(member OIDCUser) {
+	membership := Membership{TeamID: t.ID, Member: member.Username}
 	t.Members = append(t.Members, member)
 	db.Save(&membership)
 }
 
-func (t Team) addMembersToTeam(members []string) {
+func (t *Team) addMembersToTeam(members []OIDCUser) {
 	for _, member := range members {
 		t.addMemberToTeam(member)
 	}
 }
 
-func getAllTeams() []Team {
-	var teams []Team
+func getAllTeams() []*Team {
+	var teams []*Team
 	db.Find(&teams)
 	for _, team := range teams {
 		team.getTeamMembership()
@@ -77,6 +81,12 @@ func getTeamByID(ID uuid.UUID) Team {
 	return t
 }
 
+func dropAllTeams() {
+	tx := db.Where("1 = 1").Delete(&Membership{})
+	fmt.Println(tx.RowsAffected, tx.Error)
+	db.Where("1 = 1").Delete(&Team{})
+}
+
 func disperseMembersToTeams(members []OIDCUser) {
 	teams := getAllTeams()
 	teamCount := len(teams)
@@ -84,8 +94,11 @@ func disperseMembersToTeams(members []OIDCUser) {
 		members[i], members[j] = members[j], members[i]
 	})
 	for index, member := range members {
+		if isMemberOnTeam(member.Username) {
+			continue
+		}
 		currentTeam := index % teamCount
-		teams[currentTeam].addMemberToTeam(member.Username)
+		teams[currentTeam].addMemberToTeam(member)
 	}
 }
 
@@ -98,13 +111,13 @@ func HandleTeamCreation(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
 		return
 	}
+	dropAllTeams()
 	teamCountRaw := c.PostForm("teamCount")
 	teamCount, err := strconv.Atoi(teamCountRaw)
 	if err != nil {
 		log.Println("Error converting teamCount to int:", err)
 		return
 	}
-	fmt.Println(teamCount)
 	teams := make([]Team, teamCount)
 	members, eboardCount := getAttendingMembers()
 	if teamCount > eboardCount {
@@ -114,9 +127,14 @@ func HandleTeamCreation(c *gin.Context) {
 	eboard := members[0:teamCount]
 	members = members[teamCount:]
 	for i := 0; i < teamCount; i++ {
+		if isMemberOnTeam(eboard[i].Username) {
+			continue
+		}
+		fmt.Println(eboard[i])
 		teams[i] = createTeam()
-		teams[i].addMemberToTeam(eboard[i].Username)
+		teams[i].addMemberToTeam(eboard[i])
 	}
+	fmt.Println(members)
 	disperseMembersToTeams(members)
 	c.Status(200)
 }

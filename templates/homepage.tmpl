@@ -3,22 +3,19 @@
 {{ if not .SessionState }}
     <h2>You're {{ if not .IsAttending }}<strong>not</strong> {{ end }}in this Selections session.</h2>
 {{ end }}
-<div class="container">
-    <div class="row">
-        Your team is:
-    </div>
-    <div class="row row-cols-4-lg row-cols-2-md row-cols-1-xs">
-        <div class="col">
-            <span>Team Member</span>
-        </div>
-        <div class="col">
-            <span>Team Member</span>
-        </div>
-        <div class="col">
-            <span>Team Member</span>
-        </div>
-        <div class="col">
-            <span>Team Member</span>
+<div class="card mt-2 mb-2">
+    <div class="card-body">
+        <h4 class="card-title">Team {{.Team.ID}}</h4>
+        <div class="row">
+            {{ range .Team.Members }}
+                <div class="col-4 col-md-2">
+                    <img src="https://profiles.csh.rit.edu/image/{{ .Username }}" class="rounded-circle"
+                         width="60" height="60" style="display:block; margin: 20px auto 0;">
+                    <div style="text-align:center">
+                        {{ .Username }}
+                    </div>
+                </div>
+            {{ end }}
         </div>
     </div>
 </div>

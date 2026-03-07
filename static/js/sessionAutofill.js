@@ -14,7 +14,9 @@ async function onLoad() {
             'Content-Type': "application/json"
         }
     }).then(res => res.json())
-        .then((data) => this.members = data.members)
+        .then((data) => {
+            this.members = data.Members
+        })
 
     $(input).selectize({
         plugins: ['remove_button'],

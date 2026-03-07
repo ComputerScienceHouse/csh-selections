@@ -2,14 +2,12 @@ package internal
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -68,8 +66,7 @@ func getAttendingMembers() ([]OIDCUser, int) {
 
 func HandleSessionHomePage(c *gin.Context) {
 	user := getUserData(c)
-	addedToTeam := getTeamForMember(user.Username).ID != uuid.UUID{}
-	c.HTML(http.StatusOK, "homepage.tmpl", templateHeaders(c, map[string]any{"OnATeam": addedToTeam, "IsAttending": isMemberAttending(user.Username)}))
+	c.HTML(http.StatusOK, "homepage.tmpl", templateHeaders(c, map[string]any{"OnATeam": isMemberOnTeam(user.Username), "IsAttending": isMemberAttending(user.Username), "Team": getTeamForMember(user.Username)}))
 }
 
 func HandleSessionManagementPage(c *gin.Context) {
@@ -78,29 +75,39 @@ func HandleSessionManagementPage(c *gin.Context) {
 		return
 	}
 	attendees, eboard := getAttendingMembers()
-	c.HTML(http.StatusOK, "sessionManagement.tmpl", templateHeaders(c, map[string]any{"Attendance": attendees, "EBoard": eboard, "Teams": getAllTeams()}))
+	teams := getAllTeams()
+	c.HTML(http.StatusOK, "sessionManagement.tmpl", templateHeaders(c, map[string]any{"Attendance": attendees, "EBoard": eboard, "Teams": teams}))
 }
 
 // POST functions
 
 func HandleSessionAddMembers(c *gin.Context) {
 	members := c.PostForm("membersSelect")
+	members = strings.TrimSpace(members)
+	if members == "" {
+		c.JSON(http.StatusBadRequest, "You need to provide members")
+	}
 	memberList := strings.Split(members, ",")
 	for _, member := range memberList {
-		fmt.Println(member)
 		user := oidcClient.GetUserInfo(member)
 		save := SessionAttendance{Member: member, IsEboard: user.IsEboard()}
 		tx := db.Create(&save)
 		if tx.Error != nil {
 			log.Println("HandleSessionAddMembers", tx.Error)
+			c.JSON(http.StatusInternalServerError, nil)
+			return
 		}
 	}
-	HandleSessionManagementPage(c)
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func HandleSessionEligibleMemberList(c *gin.Context) {
 	if !isUserAdmin(c) {
 		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
+		return
+	}
+	if members, b := goCache.Get("eligibleMembers"); b {
+		c.JSON(http.StatusOK, members)
 		return
 	}
 	var members []map[string]string
@@ -110,6 +117,7 @@ func HandleSessionEligibleMemberList(c *gin.Context) {
 		}
 		members = append(members, map[string]string{"Username": user.Username, "Name": user.FirstName + " " + user.LastName})
 	}
+	goCache.SetDefault("eligibleMembers", members)
 	c.JSON(http.StatusOK, gin.H{"Members": members})
 }
 
@@ -140,5 +148,5 @@ func HandleSessionChanging(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, "Invalid state to change to")
 		}
 	}
-	HandleSessionManagementPage(c)
+	c.JSON(http.StatusOK, nil)
 }

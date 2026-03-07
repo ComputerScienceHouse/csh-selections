@@ -5,6 +5,7 @@ function formSubmit(event) {
     request.open('POST', form.action, true);
     request.onload = function () { // request successful
         // we can use server response to our request now
+        location.reload()
     };
 
     request.onerror = function () {

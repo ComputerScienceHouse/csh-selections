@@ -3,9 +3,11 @@ package internal
 import (
 	"context"
 	"log"
+	"time"
 
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/patrickmn/go-cache"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -14,6 +16,7 @@ import (
 var db *gorm.DB
 var s3client *s3.Client
 var oidcClient OIDCClient
+var goCache *cache.Cache
 
 func InitData() {
 	selectionsDb, err := gorm.Open(postgres.Open(env.DatabaseUri), &gorm.Config{
@@ -44,6 +47,10 @@ func InitData() {
 		log.Println("Couldn't migrate SessionState table:", err)
 		return
 	}
+	if tx := db.Find(&SessionState{PK: 1}); tx.RowsAffected != 1 {
+		log.Println("SessionState is empty. Adding default false.")
+		db.Create(&SessionState{State: false, User: "SELECTIONS_INIT", ModifiedDate: time.Now()})
+	}
 	err = db.AutoMigrate(&Rating{})
 	if err != nil {
 		log.Println("Couldn't migrate Rating table:", err)
@@ -62,4 +69,6 @@ func InitData() {
 	s3client = s3.NewFromConfig(s3config)
 
 	oidcClient.setupOidcClient(env.OIDCClientID, env.OIDCClientSecret)
+
+	goCache = cache.New(5*time.Minute, 10*time.Minute)
 }

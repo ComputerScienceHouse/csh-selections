@@ -104,7 +104,7 @@ func (user OIDCUser) IsEboard() bool {
 func (client *OIDCClient) GetActiveUsers() []OIDCUser {
 	htclient := &http.Client{}
 	//active
-	req, err := http.NewRequest("GET", client.providerBase+"/auth/admin/realms/csh/groups/a97a191e-5668-43f5-bc0c-6eefc2b958a7/Members", nil)
+	req, err := http.NewRequest("GET", client.providerBase+"/auth/admin/realms/csh/groups/a97a191e-5668-43f5-bc0c-6eefc2b958a7/members", nil)
 	if err != nil {
 		log.Println(err)
 		return nil
@@ -119,7 +119,7 @@ func (client *OIDCClient) GetActiveUsers() []OIDCUser {
 	ret := make([]OIDCUser, 0)
 	err = json.NewDecoder(resp.Body).Decode(&ret)
 	if err != nil {
-		log.Println(err)
+		log.Println("GetActiveUsers", err)
 		return nil
 	}
 	return ret
