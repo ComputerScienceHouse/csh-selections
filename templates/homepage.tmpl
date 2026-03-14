@@ -3,20 +3,29 @@
 {{ if not .SessionState }}
     <h2>You're {{ if not .IsAttending }}<strong>not</strong> {{ end }}in this Selections session.</h2>
 {{ end }}
-<div class="card mt-2 mb-2">
-    <div class="card-body">
-        <h4 class="card-title">Team {{.Team.ID}}</h4>
-        <div class="row">
-            {{ range .Team.Members }}
-                <div class="col-4 col-md-2">
-                    <img src="https://profiles.csh.rit.edu/image/{{ .Username }}" class="rounded-circle"
-                         width="60" height="60" style="display:block; margin: 20px auto 0;">
-                    <div style="text-align:center">
-                        {{ .Username }}
+{{ if not (eq .Team.ID .NilUUID) }}
+    <div class="card my-2">
+        <div class="card-body">
+            <h4 class="card-title">Team {{.Team.ID}}</h4>
+            <div class="row">
+                {{ range .Team.Members }}
+                    <div class="col-4 col-md-2">
+                        <img src="https://profiles.csh.rit.edu/image/{{ .Username }}" class="rounded-circle"
+                             width="60" height="60" style="display:block; margin: 20px auto 0;">
+                        <div style="text-align:center">
+                            {{ .Username }}
+                        </div>
                     </div>
-                </div>
-            {{ end }}
+                {{ end }}
+            </div>
         </div>
     </div>
-</div>
+    {{ if .SessionState }}
+        <div class="my-2">
+            <object class="w-100 h-auto" type="application/pdf" data="{{ .TeamApplication.PresignedURL }}">
+
+            </object>
+        </div>
+    {{ end }}
+{{ end }}
 {{ template "footer.tmpl" . }}

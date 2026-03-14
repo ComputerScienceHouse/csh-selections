@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/patrickmn/go-cache"
@@ -15,6 +16,7 @@ import (
 
 var db *gorm.DB
 var s3client *s3.Client
+var s3presign *s3.PresignClient
 var oidcClient OIDCClient
 var goCache *cache.Cache
 
@@ -66,7 +68,12 @@ func InitData() {
 	if err != nil {
 		log.Println("Error loading s3 config:", err)
 	}
-	s3client = s3.NewFromConfig(s3config)
+	s3client = s3.NewFromConfig(s3config, func(o *s3.Options) {
+		o.UsePathStyle = true
+		o.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
+		o.ResponseChecksumValidation = aws.ResponseChecksumValidationWhenRequired
+	})
+	s3presign = s3.NewPresignClient(s3client)
 
 	oidcClient.setupOidcClient(env.OIDCClientID, env.OIDCClientSecret)
 

@@ -15,8 +15,3 @@ function formSubmit(event) {
 
     request.send(new FormData(form)); // create FormData from form that triggered event
 }
-
-// and you can attach form submit event like this for example
-function attachFormSubmitEvent(formId) {
-    document.getElementById(formId).addEventListener("submit", formSubmit);
-}

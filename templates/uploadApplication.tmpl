@@ -1,8 +1,0 @@
-{{ template "header.tmpl" . }}
-<h1>Upload Application Here</h1>
-<form class="col-lg-6 gx-3" action="/application/upload" method="POST" enctype="multipart/form-data">
-    <label for="applicationFile" class="form-label">Select application for upload</label>
-    <input class="form-control" type="file" id="applicationFile" accept="application/pdf">
-    <button type="submit" class="mt-2 btn btn-primary">Upload</button>
-</form>
-{{ template "footer.tmpl" . }}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"net/http"
 
 	loadenv "github.com/caarlos0/env/v11"
@@ -30,13 +31,18 @@ func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	router.StaticFS("/static", http.Dir("static"))
+	router.FuncMap = template.FuncMap{"len": Length}
 	//Define routes here
 	router.GET("/auth/login", auth.AuthRequest)
 	router.GET("/auth/callback", auth.AuthCallback)
 	router.GET("/auth/logout", auth.AuthLogout)
 	router.GET("/", auth.AuthWrapper(HandleSessionHomePage))
-	router.GET("/application/upload", auth.AuthWrapper(HandleApplicationUploadPage))
+	router.GET("/admin/debug", auth.AuthWrapper(HandleDebugPage))
+	router.POST("/admin/debug", auth.AuthWrapper(HandleDebugPost))
 	router.POST("/application/upload", auth.AuthWrapper(HandleApplicationFileUpload))
+	router.GET("/application/manage", auth.AuthWrapper(HandleApplicationManagementPage))
+	router.GET("/application/:id", auth.AuthWrapper(HandleApplicationGet))
+	router.DELETE("/application/:id", auth.AuthWrapper(HandleApplicationDelete))
 	router.GET("/session/manage", auth.AuthWrapper(HandleSessionManagementPage))
 	router.POST("/session/manage", auth.AuthWrapper(HandleSessionChanging))
 	router.GET("/session/allMembers", auth.AuthWrapper(HandleSessionEligibleMemberList))

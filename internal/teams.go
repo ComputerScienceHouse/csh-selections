@@ -12,8 +12,9 @@ import (
 )
 
 type Team struct {
-	ID      uuid.UUID  `gorm:"primarykey"`
-	Members []OIDCUser `gorm:"-"`
+	ID            uuid.UUID  `gorm:"primarykey"`
+	ApplicationID uuid.UUID  `gorm:"refrences:Application,ID"`
+	Members       []OIDCUser `gorm:"-"`
 }
 
 type Membership struct {
@@ -31,11 +32,11 @@ func createTeam() Team {
 	return ret
 }
 
-func getTeamForMember(member string) Team {
+func getTeamForMember(member string) *Team {
 	membership := Membership{Member: member}
 	res := db.Limit(1).First(&membership)
 	if res.Error != nil {
-		return Team{}
+		return &Team{}
 	}
 	team := getTeamByID(membership.TeamID)
 	return team
@@ -65,6 +66,11 @@ func (t *Team) addMembersToTeam(members []OIDCUser) {
 	}
 }
 
+func (t *Team) setTeamApplication(appID uuid.UUID) {
+	t.ApplicationID = appID
+	db.Save(&t)
+}
+
 func getAllTeams() []*Team {
 	var teams []*Team
 	db.Find(&teams)
@@ -74,8 +80,8 @@ func getAllTeams() []*Team {
 	return teams
 }
 
-func getTeamByID(ID uuid.UUID) Team {
-	t := Team{}
+func getTeamByID(ID uuid.UUID) *Team {
+	t := &Team{}
 	db.First(&t, ID)
 	t.getTeamMembership()
 	return t
@@ -130,11 +136,29 @@ func HandleTeamCreation(c *gin.Context) {
 		if isMemberOnTeam(eboard[i].Username) {
 			continue
 		}
-		fmt.Println(eboard[i])
 		teams[i] = createTeam()
 		teams[i].addMemberToTeam(eboard[i])
 	}
-	fmt.Println(members)
 	disperseMembersToTeams(members)
 	c.Status(200)
+}
+
+func HandleTeamApplicationAssignment(c *gin.Context) {
+	if !isUserAdmin(c) {
+		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
+		return
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		log.Println("Failed while parsing application id", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	appId, err := uuid.Parse(c.PostForm("application_id"))
+	if err != nil {
+		log.Println("Failed while parsing application id", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	getTeamByID(id).setTeamApplication(appId)
 }

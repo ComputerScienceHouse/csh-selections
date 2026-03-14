@@ -62,11 +62,28 @@ func getAttendingMembers() ([]OIDCUser, int) {
 	return ret, eboard
 }
 
+func clearSession() bool {
+	if IsSelectionsActive() {
+		log.Println("Selections State was requested to cleared but selections is active. This will not continue.")
+		return false
+	}
+	dropAllTeams()
+	db.Where("1 = 1").Delete(&SessionAttendance{})
+	//TODO: delete S3 objects (application PDFs)
+	return true
+}
+
 // Page functions
 
 func HandleSessionHomePage(c *gin.Context) {
 	user := getUserData(c)
-	c.HTML(http.StatusOK, "homepage.tmpl", templateHeaders(c, map[string]any{"OnATeam": isMemberOnTeam(user.Username), "IsAttending": isMemberAttending(user.Username), "Team": getTeamForMember(user.Username)}))
+	team := getTeamForMember(user.Username)
+	c.HTML(http.StatusOK, "homepage.tmpl", templateHeaders(c, map[string]any{
+		"OnATeam":         isMemberOnTeam(user.Username),
+		"IsAttending":     isMemberAttending(user.Username),
+		"Team":            team,
+		"TeamApplication": getApplication(team.ApplicationID),
+	}))
 }
 
 func HandleSessionManagementPage(c *gin.Context) {
@@ -149,4 +166,16 @@ func HandleSessionChanging(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusOK, nil)
+}
+
+func HandleClearingSession(c *gin.Context) {
+	if !isUserAdmin(c) {
+		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
+		return
+	}
+	if !clearSession() {
+		c.JSON(http.StatusBadRequest, "Selections cannot be cleared while active.")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{})
 }

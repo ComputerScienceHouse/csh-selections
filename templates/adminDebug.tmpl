@@ -1,0 +1,6 @@
+{{ template "header.tmpl" . }}
+<form class="m-2" method="post" action="/admin/debug" onsubmit="formSubmit(event)">
+    <input type="radio" name="debugAction" value="ClearBucket" class="d-none" checked>
+    <button class="btn btn-primary" type="submit">Clear Bucket</button>
+</form>
+{{ template "footer.tmpl" . }}
