@@ -43,6 +43,7 @@ func main() {
 	router.GET("/application/manage", auth.AuthWrapper(HandleApplicationManagementPage))
 	router.GET("/application/:id", auth.AuthWrapper(HandleApplicationGet))
 	router.DELETE("/application/:id", auth.AuthWrapper(HandleApplicationDelete))
+	router.POST("/team/:id/assign", auth.AuthWrapper(HandleTeamApplicationAssignment))
 	router.GET("/session/manage", auth.AuthWrapper(HandleSessionManagementPage))
 	router.POST("/session/manage", auth.AuthWrapper(HandleSessionChanging))
 	router.GET("/session/allMembers", auth.AuthWrapper(HandleSessionEligibleMemberList))

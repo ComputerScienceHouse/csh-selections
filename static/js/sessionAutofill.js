@@ -15,7 +15,7 @@ async function onLoad() {
         }
     }).then(res => res.json())
         .then((data) => {
-            this.members = data.Members
+            this.members = data
         })
 
     $(input).selectize({

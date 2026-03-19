@@ -8,11 +8,14 @@
               href="https://assets.csh.rit.edu/csh-material-bootstrap/5.3.8/dist/css/bootstrap.min.css">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        {{if .Css }}
+            <link rel="stylesheet" href="/static/css/{{ .Css }}">
+        {{ end }}
         <script src="https://assets.csh.rit.edu/csh-material-bootstrap/5.3.8/dist/js/color-modes.js"></script>
     </head>
 
     <body class="min-vh-100">
-    <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
+    <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle z-3">
         <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button"
                 aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (dark)">
             <svg class="bi my-1 theme-icon-active" height="16" width="16" aria-hidden="true">
@@ -59,60 +62,61 @@
             </li>
         </ul>
     </div>
-        <nav class="min-vh-100 position-fixed top-0 d-flex flex-column flex-shrink-0 p-3 bg-body-secondary shadow" style="width: 280px">
-            <a href="/"
-               class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-                <img class="object-fit-contain ms-2 me-2" height="32"
-                     src="https://assets.csh.rit.edu/pubsite/csh_logo_square.svg">
-                <span class="fs-4"><strong>Selections</strong></span>
-            </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <a href="/" class="nav-link link-body-emphasis" aria-current="page">
-                        <!--active should be active class-->
+    <nav class="min-vh-100 position-fixed top-0 d-flex flex-column flex-shrink-0 p-3 bg-body-secondary shadow"
+         style="width: 280px">
+        <a href="/"
+           class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+            <img class="object-fit-contain ms-2 me-2" height="32"
+                 src="https://assets.csh.rit.edu/pubsite/csh_logo_square.svg">
+            <span class="fs-4"><strong>Selections</strong></span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="/" class="nav-link link-body-emphasis" aria-current="page">
+                    <!--active should be active class-->
+                    <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                        <use xlink:href="#home"></use>
+                    </svg>
+                    Home
+                </a>
+            </li>
+            {{ if .IsAdmin }}
+                <li>
+                    <a href="/session/manage" class="nav-link link-body-emphasis">
                         <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
-                            <use xlink:href="#home"></use>
+                            <use xlink:href="#speedometer2"></use>
                         </svg>
-                        Home
+                        Session Management
                     </a>
                 </li>
-                {{ if .IsAdmin }}
-                    <li>
-                        <a href="/session/manage" class="nav-link link-body-emphasis">
-                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
-                                <use xlink:href="#speedometer2"></use>
-                            </svg>
-                            Session Management
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/application/manage" class="nav-link link-body-emphasis">
-                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
-                                <use xlink:href="#speedometer2"></use>
-                            </svg>
-                            Applications
-                        </a>
-                    </li>
-                {{ end }}
+                <li>
+                    <a href="/application/manage" class="nav-link link-body-emphasis">
+                        <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                            <use xlink:href="#speedometer2"></use>
+                        </svg>
+                        Applications
+                    </a>
+                </li>
+            {{ end }}
+        </ul>
+        <div class="flex-grow-1"></div>
+        <hr>
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-body text-decoration-none dropdown-toggle"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://profiles.csh.rit.edu/image/{{.Username}}" alt="" width="32" height="32"
+                     class="rounded-circle me-2">
+                <strong>{{.Username}}</strong> </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                <li><a class="dropdown-item" href="https://profiles.csh.rit.edu/user/{{.Username}}">Profile</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="/auth/logout">Sign out</a></li>
             </ul>
-            <div class="flex-grow-1"></div>
-            <hr>
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-body text-decoration-none dropdown-toggle"
-                   data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://profiles.csh.rit.edu/image/{{.Username}}" alt="" width="32" height="32"
-                         class="rounded-circle me-2">
-                    <strong>{{.Username}}</strong> </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <li><a class="dropdown-item" href="https://profiles.csh.rit.edu/user/{{.Username}}">Profile</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item" href="/auth/logout">Sign out</a></li>
-                </ul>
-            </div>
-        </nav>
-        <main class="m-2 container-md" style="padding-left: 280px">
+        </div>
+    </nav>
+    <main class="m-2 container-md min-vh-100 d-flex flex-column" style="padding-left: 280px">
 
 {{ end }}

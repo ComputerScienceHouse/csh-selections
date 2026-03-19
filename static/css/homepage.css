@@ -1,0 +1,11 @@
+@media screen and (min-width: 800px) {
+    .review-container {
+        width: calc(99vw - 280px);
+        max-height: 100vh;
+    }
+
+}
+
+.criteria {
+    height: min-content;
+}

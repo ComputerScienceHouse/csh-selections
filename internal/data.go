@@ -63,6 +63,11 @@ func InitData() {
 		log.Println("Couldn't migrate Rating table:", err)
 		return
 	}
+	err = db.AutoMigrate(&Criterion{})
+	if err != nil {
+		log.Println("Couldn't migrate Criteria table:", err)
+		return
+	}
 
 	s3config, err := awsconfig.LoadDefaultConfig(context.Background())
 	if err != nil {

@@ -1,29 +1,43 @@
 {{ template "header.tmpl" . }}
-<h1>Applications</h1>
+<h1 xmlns="http://www.w3.org/1999/html">Applications</h1>
 <h2>Assign Applications to Teams</h2>
 <span>There are currently {{ len .Teams }} teams to assign to:</span>
-{{ range .Teams }}
-    <div class="row mb-2">
-        <span class="col-md-auto text-nowrap">Team {{ .ID }}</span>
-        <span class="col-md-auto text-nowrap">{{ if not (eq .ApplicationID $.NilUUID) }}Assigned {{ .ApplicationID }}</span>{{ else }}
-        <strong>UNASSIGNED</strong></span>
-        <div class="col-md-auto text-nowrap">
-            <select name="applicationID">
-                {{ range $.Applications }}
-                    <option disabled selected>Assign Application</option>
-                    <option value="{{.ID}}">{{.ID}}</option>
+<table id="team-assignments">
+    <tbody>
+    {{ range .Teams }}
+        <tr>
+            <td class="py-2 align-middle text-nowrap">Team {{ .ID }}</td>
+            <td class="p-2 text-center text-nowrap">
+                {{ if not (eq .ApplicationID $.NilUUID) }}
+                    Assigned {{ .ApplicationID }}{{ else }}
+                    <strong>UNASSIGNED</strong>
+
                 {{ end }}
-            </select>
-        </div>
-        {{ end }}
-    </div>
-{{ end }}
+            </td>
+            <td>
+                <form class="pb-2" action="/team/{{ .ID }}/assign" method="POST">
+                    <select name="applicationID">
+                        <option disabled selected>Assign Application</option>
+                        {{ range $.Applications }}
+                            {{ if not .Assigned }}
+                                <option value="{{.ID}}">{{.ID}}</option>
+                            {{ end }}
+                        {{ end }}
+                    </select>
+                    <button class="btn btn-success d-none" type="submit">Apply</button>
+                </form>
+            </td>
+        </tr>
+    {{ end }}
+    </tbody>
+</table>
 <h2 class="mt-5">Uploaded Applications</h2>
 <span>There are currently {{ len .Applications }} applications.</span>
 {{ range .Applications }}
-    <div class="col mb-4">
-        <a href="{{.PresignedURL}}" target="_blank">{{.ID}}</a>
-        <button type="submit" class="btn btn-danger"
+    <div class="row">
+
+        <a class="col-auto d-inline my-auto" href="{{.PresignedURL}}" target="_blank">{{.ID}}</a>
+        <button type="submit" class="d-inline btn btn-danger col-auto"
                 onclick="fetch('/application/{{.ID}}', {method: 'DELETE'}); location.reload()">Delete
         </button>
     </div>
@@ -34,4 +48,14 @@
     <input class="form-control" type="file" name="applicationFile" id="applicationFile" accept="application/pdf">
     <button type="submit" class="mt-2 btn btn-primary">Upload</button>
 </form>
+<script>
+    let forms = document.querySelectorAll('#team-assignments > tbody > tr > td:nth-child(3) > form')
+    console.log(forms)
+    forms.forEach(function (form) {
+        form.firstElementChild.addEventListener('change', event => {
+            event.target.nextElementSibling.classList.remove("d-none")
+            event.target.firstElementChild.remove()
+        })
+    })
+</script>
 {{ template "footer.tmpl" . }}

@@ -17,8 +17,9 @@ import (
 
 type Application struct {
 	ID           uuid.UUID `gorm:"primarykey"`
-	Ratings      []Rating  `gorm:"-"`
-	PresignedURL string    `gorm:"-"`
+	Assigned     bool
+	Ratings      []Rating `gorm:"-"`
+	PresignedURL string   `gorm:"-"`
 }
 
 type Rating struct {
@@ -26,6 +27,17 @@ type Rating struct {
 	Member        string    `gorm:"primarykey"`
 	SubmittedTime time.Time
 	Score         int
+}
+
+type Criterion struct {
+	Name     string `gorm:"primarykey"`
+	MinScore int
+	MaxScore int
+	Weight   int
+}
+
+func (Criterion) TableName() string {
+	return "criteria"
 }
 
 /* ==============
@@ -89,6 +101,16 @@ func getApplication(uuid uuid.UUID) *Application {
 	res := Application{ID: uuid}
 	res.PresignedURL = res.GetPresignedURL()
 	return &res
+}
+
+func getCriteria() []Criterion {
+	if ret, b := goCache.Get("criteria"); b {
+		return ret.([]Criterion)
+	}
+	var res []Criterion
+	db.Find(&res)
+	goCache.SetDefault("criteria", res)
+	return res
 }
 
 func (app Application) Delete() error {

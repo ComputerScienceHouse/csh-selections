@@ -83,6 +83,8 @@ func HandleSessionHomePage(c *gin.Context) {
 		"IsAttending":     isMemberAttending(user.Username),
 		"Team":            team,
 		"TeamApplication": getApplication(team.ApplicationID),
+		"Css":             "homepage.css",
+		"Criteria":        getCriteria(),
 	}))
 }
 
@@ -135,7 +137,7 @@ func HandleSessionEligibleMemberList(c *gin.Context) {
 		members = append(members, map[string]string{"Username": user.Username, "Name": user.FirstName + " " + user.LastName})
 	}
 	goCache.SetDefault("eligibleMembers", members)
-	c.JSON(http.StatusOK, gin.H{"Members": members})
+	c.JSON(http.StatusOK, members)
 }
 
 func HandleSessionAttendingList(c *gin.Context) {

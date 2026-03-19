@@ -150,15 +150,18 @@ func HandleTeamApplicationAssignment(c *gin.Context) {
 	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		log.Println("Failed while parsing application id", err)
+		log.Println("Failed while parsing team id", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	appId, err := uuid.Parse(c.PostForm("application_id"))
+	appId, err := uuid.Parse(c.PostForm("applicationID"))
 	if err != nil {
 		log.Println("Failed while parsing application id", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	getTeamByID(id).setTeamApplication(appId)
+	app := getApplication(appId)
+	app.Assigned = true
+	db.Save(&app)
 }
