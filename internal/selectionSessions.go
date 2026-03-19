@@ -85,6 +85,7 @@ func HandleSessionHomePage(c *gin.Context) {
 		"TeamApplication": getApplication(team.ApplicationID),
 		"Css":             "homepage.css",
 		"Criteria":        getCriteria(),
+		"Rated":           didUserRateApplication(team.ApplicationID, user.Username),
 	}))
 }
 

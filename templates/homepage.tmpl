@@ -21,53 +21,55 @@
         </div>
     </div>
     {{ if .SessionState }}
-        <div class="my-2 g-2 review-container d-flex flex-wrap container-lg flex-grow-1">
-            <object class="d-block flex-item mx-2 flex-grow-1" type="application/pdf"
-                    data="{{ .TeamApplication.PresignedURL }}">
-            </object>
-            <div class="card m-2 flex-item criteria">
-                <div class="card-body flex-grow-0">
-                    <h5 class="card-title">Selections Rubric</h5>
-                    <form action="/application/{{ .TeamApplication.ID }}" method="POST" id="application-rubric">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th scope="col">Criterion</th>
-                                <th scope="col">Range</th>
-                                <th scope="col">Score</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {{ range .Criteria }}
+        {{ if not .Rated }}
+            <div class="my-2 g-2 review-container d-flex flex-wrap container-lg flex-grow-1">
+                <object class="d-block flex-item mx-2 flex-grow-1" type="application/pdf"
+                        data="{{ .TeamApplication.PresignedURL }}">
+                </object>
+                <div class="card m-2 flex-item criteria">
+                    <div class="card-body flex-grow-0">
+                        <h5 class="card-title">Selections Rubric</h5>
+                        <form action="/application/{{ .TeamApplication.ID }}/rate" method="POST" id="application-rubric"
+                              onsubmit="checkRubric(event)">
+                            <table class="table table-striped">
+                                <thead>
                                 <tr>
-                                    <th class="align-middle" scope="row">{{ .Name }}</th>
-                                    <td class="d-flex gap-2"><span>{{ .MinScore }}</span>
-                                        <input value="{{ .MinScore }}"
-                                               min="{{ .MinScore }}"
-                                               max="{{ .MaxScore }}" type="range"
-                                               name="{{ .Name }}"
-                                               class="form-range"
-                                               style="font-size: 13px;"
-                                               form="application-rubric"
-                                               required>
-                                        <span>{{ .MaxScore }}</span></td>
-                                    <td>
-                                        <span class="text-center d-inline-block w-100">{{ .MinScore }}</span>
-                                    </td>
+                                    <th scope="col">Criterion</th>
+                                    <th scope="col">Range</th>
+                                    <th scope="col">Score</th>
                                 </tr>
+                                </thead>
+                                <tbody>
+                                {{ range .Criteria }}
+                                    <tr>
+                                        <th class="align-middle" scope="row">{{ .Name }}</th>
+                                        <td class="d-flex gap-2"><span>{{ .MinScore }}</span>
+                                            <input value="{{ .MinScore }}"
+                                                   min="{{ .MinScore }}"
+                                                   max="{{ .MaxScore }}" type="range"
+                                                   name="{{ .Name }}"
+                                                   class="form-range"
+                                                   style="font-size: 13px;"
+                                                   form="application-rubric"
+                                                   required>
+                                            <span>{{ .MaxScore }}</span></td>
+                                        <td>
+                                            <span class="text-center d-inline-block w-100">{{ .MinScore }}</span>
+                                        </td>
+                                    </tr>
 
-                            {{ end }}
-                            </tbody>
-                        </table>
-                        <button type="submit" class="btn btn-primary" form="application-rubric" id="submit-rubric">Submit</button>
-                    </form>
+                                {{ end }}
+                                </tbody>
+                            </table>
+                            <button type="submit" class="btn btn-primary" form="application-rubric">Submit</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
             <script>
                 let ranges = document.querySelectorAll('input[type=range]')
-                ranges.forEach(function(range) {
-                    range.addEventListener('input', function(event) {
+                ranges.forEach(function (range) {
+                    range.addEventListener('input', function (event) {
                         updateValue(event.target)
                     })
                     updateValue(range)
@@ -78,11 +80,26 @@
                     target.parentElement.nextElementSibling.firstElementChild.textContent = target.value
                 }
 
+                let warn = false
 
-                document.querySelector('#submit-rubric').addEventListener('submit', function(event) {
-
-                })
+                function checkRubric(event) {
+                    let d = new FormData(event.target)
+                    console.log("hi")
+                    for (const [key, value] of d.entries()) {
+                        console.log(key, value)
+                        if (parseInt(value) === 0 && !warn) {
+                            alert("At least one of your values are 0, are you sure you want to submit this form?")
+                            warn = true
+                            event.preventDefault()
+                            return
+                        }
+                    }
+                    formSubmit(event)
+                }
             </script>
+        {{ else }}
+            <h5>You already rated this application. Please wait until your team is ready to be assigned a new application.</h5>
+        {{ end }}
     {{ end }}
 {{ end }}
 {{ template "footer.tmpl" . }}

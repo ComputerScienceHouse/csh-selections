@@ -2,7 +2,7 @@ function formSubmit(event) {
     event.preventDefault();
     let form = event.target;
     let request = new XMLHttpRequest();
-    request.open('POST', form.action, true);
+    request.open(form.method, form.action, true);
     request.onload = function () { // request successful
         // we can use server response to our request now
         location.reload()

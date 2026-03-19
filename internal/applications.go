@@ -6,6 +6,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -113,6 +114,11 @@ func getCriteria() []Criterion {
 	return res
 }
 
+func didUserRateApplication(applicationId uuid.UUID, username string) bool {
+	tx := db.Find(&Rating{ApplicationID: applicationId, Member: username})
+	return tx.RowsAffected > 0
+}
+
 func (app Application) Delete() error {
 	_, err := s3client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(env.BucketName),
@@ -202,14 +208,14 @@ func HandleApplicationFileUpload(c *gin.Context) {
 }
 
 func HandleApplicationDelete(c *gin.Context) {
+	if !isUserAdmin(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		log.Println("Failed while parsing application id", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	if !isUserAdmin(c) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 	err = Application{ID: id}.Delete()
@@ -217,4 +223,42 @@ func HandleApplicationDelete(c *gin.Context) {
 		log.Println("Error deleting application", id, err)
 		return
 	}
+}
+
+func HandleApplicationRating(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		log.Println("Failed while parsing application id", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	}
+	user := getUserData(c)
+	if getTeamForMember(user.Username).ApplicationID != id || !isUserAdmin(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	if didUserRateApplication(id, user.Username) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You already rated this application"})
+		return
+	}
+	//score the application
+	totalScore := 0
+	for _, crit := range getCriteria() {
+		score := c.PostForm(crit.Name)
+		scoreInt, err := strconv.Atoi(score)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			return
+		}
+		totalScore += scoreInt * crit.Weight
+	}
+	//present score
+	application := getApplication(id)
+	rating := Rating{
+		ApplicationID: id,
+		Member:        user.Username,
+		SubmittedTime: time.Now(),
+		Score:         totalScore,
+	}
+	db.Save(&rating)
+	application.Ratings = append(application.Ratings, rating)
 }

@@ -42,6 +42,7 @@ func main() {
 	router.POST("/application/upload", auth.AuthWrapper(HandleApplicationFileUpload))
 	router.GET("/application/manage", auth.AuthWrapper(HandleApplicationManagementPage))
 	router.GET("/application/:id", auth.AuthWrapper(HandleApplicationGet))
+	router.POST("/application/:id/rate", auth.AuthWrapper(HandleApplicationRating))
 	router.DELETE("/application/:id", auth.AuthWrapper(HandleApplicationDelete))
 	router.POST("/team/:id/assign", auth.AuthWrapper(HandleTeamApplicationAssignment))
 	router.GET("/session/manage", auth.AuthWrapper(HandleSessionManagementPage))
