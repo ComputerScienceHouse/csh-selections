@@ -4,6 +4,7 @@ RUN apk add git
 COPY go.* .
 RUN go mod download # do this before build for caching
 COPY *.go .
+COPY internal internal
 RUN go build -v -o selections
 
 FROM docker.io/alpine
