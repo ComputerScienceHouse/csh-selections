@@ -54,6 +54,10 @@ func (t *Team) getTeamMembership() {
 	}
 }
 
+func (t *Team) deleteTeam() {
+	db.Delete(t)
+}
+
 func (t *Team) addMemberToTeam(member OIDCUser) {
 	membership := Membership{TeamID: t.ID, Member: member.Username}
 	t.Members = append(t.Members, member)
@@ -63,6 +67,16 @@ func (t *Team) addMemberToTeam(member OIDCUser) {
 func (t *Team) addMembersToTeam(members []OIDCUser) {
 	for _, member := range members {
 		t.addMemberToTeam(member)
+	}
+}
+
+func removeMemberFromTeam(member OIDCUser) {
+	res := Membership{}
+	db.Where("member = ?", member.Username).First(&res)
+	db.Delete(&res)
+	tx := db.Where(&res.TeamID).Find(nil)
+	if tx.RowsAffected == 0 {
+		getTeamByID(res.TeamID).deleteTeam()
 	}
 }
 

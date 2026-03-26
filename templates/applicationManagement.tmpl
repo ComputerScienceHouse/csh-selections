@@ -2,20 +2,26 @@
 <h1 xmlns="http://www.w3.org/1999/html">Applications</h1>
 <h2>Assign Applications to Teams</h2>
 <span>There are currently {{ len .Teams }} teams to assign to:</span>
-<table id="team-assignments">
+<table class="table" id="team-assignments">
+    <thead>
+    <tr>
+        <th class="text-center">Team ID</th>
+        <th class="text-center">Assigned Application ID</th>
+        <th class="text-center">Assign Application</th>
+    </tr>
+    </thead>
     <tbody>
     {{ range .Teams }}
         <tr>
-            <td class="py-2 align-middle text-nowrap">Team {{ .ID }}</td>
-            <td class="p-2 text-center text-nowrap">
+            <td class="align-middle text-center text-nowrap font-monospace">{{ .ID }}</td>
+            <td class="text-center align-middle text-nowrap">
                 {{ if not (eq .ApplicationID $.NilUUID) }}
-                    Assigned {{ .ApplicationID }}{{ else }}
+                    <span class="font-monospace">{{ .ApplicationID }}</span>{{ else }}
                     <strong>UNASSIGNED</strong>
-
                 {{ end }}
             </td>
             <td>
-                <form class="pb-2" action="/team/{{ .ID }}/assign" method="POST">
+                <form action="/team/{{ .ID }}/assign" method="POST">
                     <select name="applicationID">
                         <option disabled selected>Assign Application</option>
                         {{ range $.Applications }}

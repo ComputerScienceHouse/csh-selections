@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -46,6 +47,19 @@ func setSelectionsState(state bool, member string) {
 func isMemberAttending(member string) bool {
 	tx := db.First(&SessionAttendance{Member: member})
 	return tx.RowsAffected > 0
+}
+
+func removeMemberFromAttending(member string) {
+	user := oidcClient.GetUserInfo(member)
+	del := SessionAttendance{Member: user.Username}
+	if isMemberOnTeam(user.Username) {
+		removeMemberFromTeam(*user)
+	}
+	db.Delete(&del)
+}
+
+func dropAllAttendance() {
+	db.Where("1 = 1").Delete(&SessionAttendance{})
 }
 
 func getAttendingMembers() ([]OIDCUser, int) {
@@ -106,6 +120,7 @@ func HandleSessionAddMembers(c *gin.Context) {
 	members = strings.TrimSpace(members)
 	if members == "" {
 		c.JSON(http.StatusBadRequest, "You need to provide members")
+		return
 	}
 	memberList := strings.Split(members, ",")
 	for _, member := range memberList {
@@ -121,13 +136,26 @@ func HandleSessionAddMembers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
+func HandleSessionRemoveMember(c *gin.Context) {
+	json := map[string]string{"member": ""}
+	err := c.ShouldBindJSON(&json)
+	fmt.Println(json)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	member := strings.TrimSpace(json["member"])
+	if member == "" {
+		c.JSON(http.StatusBadRequest, "You need to provide a member")
+		return
+	}
+	removeMemberFromAttending(member)
+	c.JSON(http.StatusOK, gin.H{})
+}
+
 func HandleSessionEligibleMemberList(c *gin.Context) {
 	if !isUserAdmin(c) {
 		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
-		return
-	}
-	if members, b := goCache.Get("eligibleMembers"); b {
-		c.JSON(http.StatusOK, members)
 		return
 	}
 	var members []map[string]string
@@ -137,7 +165,6 @@ func HandleSessionEligibleMemberList(c *gin.Context) {
 		}
 		members = append(members, map[string]string{"Username": user.Username, "Name": user.FirstName + " " + user.LastName})
 	}
-	goCache.SetDefault("eligibleMembers", members)
 	c.JSON(http.StatusOK, members)
 }
 
@@ -157,16 +184,26 @@ func HandleSessionChanging(c *gin.Context) {
 	if res, ok := c.GetPostForm("state"); ok {
 		switch res {
 		case "start":
-			//TODO: don't allow starting with 0 teams
+			if len(getAllTeams()) < 1 {
+				c.JSON(http.StatusBadRequest, "You cannot start with 0 teams!")
+				return
+			}
 			setSelectionsState(true, user.Username)
 			break
 		case "stop":
-			//TODO: wipe all teams
+			dropAllTeams()
+			dropAllAttendance()
+			dropAllApplications()
+
 			setSelectionsState(false, user.Username)
 			break
 		default:
 			c.JSON(http.StatusBadRequest, "Invalid state to change to")
+			return
 		}
+	} else {
+		c.JSON(http.StatusBadRequest, "Invalid state")
+		return
 	}
 	c.JSON(http.StatusOK, nil)
 }

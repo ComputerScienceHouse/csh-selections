@@ -1,10 +1,10 @@
 {{ template "header.tmpl" . }}
 <h1>Selections is currently <strong>{{ if .SessionState }}ACTIVE{{ else }}INACTIVE{{ end }}</strong>.</h1>
-<form method="post" action="/session/manage">
+<form id="stateForm" method="post" action="/session/manage" onsubmit="dummyFunc(event)">
     <!--TODO: add confirm modal-->
-    <button class="btn btn-danger btn-large" id="state" name="state"
-            value="{{ if .SessionState }}stop{{ else }}start{{ end }}"
-            type="submit">{{ if .SessionState }}STOP{{ else }}START{{ end }} SESSION
+    <input name="state" value="{{ if .SessionState }}stop{{ else }}start{{ end }}" class="d-none">
+    <button class="btn btn-danger btn-large"{{ if .SessionState }} data-bs-toggle="modal" data-bs-target="#confirmStop">
+        STOP{{ else }}>START{{ end }} SESSION
     </button>
 </form>
 {{ if not .SessionState }}
@@ -19,16 +19,19 @@
             <button class="btn btn-primary" type="submit">Add Members</button>
         </form>
     </div>
-    {{ if .Attendance }}
-        <div class="p-2 mt-4">
-            <h3>Members currently selected:</h3>
-            {{ range .Attendance }}
-                <span class="badge align-items-center p-2 text-body bg-primary-subtle border border-primary-subtle">
+{{ end }}
+{{ if .Attendance }}
+    <div class="p-2 mt-4">
+        <h3>Members currently selected:</h3>
+        {{ range .Attendance }}
+            <span class="badge align-items-center p-2 text-body bg-primary-subtle border border-primary-subtle">
                     {{.FullName}} ({{.Username}})
-                    <a style="color: inherit; text-decoration: none" href="javascript:void(0)" tabindex="-1"
+                    <a style="color: inherit; text-decoration: none" href="javascript:removeMember('{{.Username}}')"
+                       tabindex="-1"
                        title="Remove">×
                     </a></span>
-            {{ end }}
+        {{ end }}
+        {{ if not .SessionState }}
             <form class="mt-2" method="post" action="/session/createTeams" onsubmit="formSubmit(event)">
                 <div class="mb-2 row">
                     <div class="col-auto">
@@ -41,8 +44,8 @@
                 </div>
                 <button class="btn btn-primary" type="submit">Create Teams</button>
             </form>
-        </div>
-    {{ end }}
+        {{ end }}
+    </div>
 {{ end }}
 <div class="p-2 mt-4">
     <h2>Teams</h2>
@@ -53,13 +56,13 @@
                     <h4 class="card-title">Team {{.ID}}</h4>
                     <div class="row">
                         {{ range .Members }}
-                        <div class="col-4 col-md-2">
-                            <img src="https://profiles.csh.rit.edu/image/{{ .Username }}" class="rounded-circle"
-                                 width="60" height="60" style="display:block; margin: 20px auto 0;">
-                            <div style="text-align:center">
-                                {{ .Username }}
+                            <div class="col-4 col-md-2">
+                                <img src="https://profiles.csh.rit.edu/image/{{ .Username }}" class="rounded-circle"
+                                     width="60" height="60" style="display:block; margin: 20px auto 0;">
+                                <div style="text-align:center">
+                                    {{ .Username }}
+                                </div>
                             </div>
-                        </div>
                         {{ end }}
                     </div>
                 </div>
@@ -68,6 +71,22 @@
     {{ else }}
         <span>There currently aren't any teams. Add some members to the session and then create teams!</span>
     {{ end }}
+</div>
+<div class="modal fade" id="confirmStop" tabindex="-1">
+    <div class="modal-dialog modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Stopping Selections Session</h5>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to stop this session?<br>
+                This will delete <strong>ALL applications and teams</strong>.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" onclick="submitSessionChange()">Stop Selections</button>
+        </div>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"></script>
 <link
@@ -83,6 +102,45 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
 ></script>
+<script>
+    function removeMember(username) {
+        let request = new XMLHttpRequest();
+        request.open('POST', 'removeMember', true);
+        request.onload = function () { // request successful
+            // we can use server response to our request now
+            if (200 <= request.status && request.status <= 210) {
+                location.reload()
+            } else {
+                console.log(request.responseText)
+            }
+        };
+
+        request.send(JSON.stringify({'member': username}));
+    }
+
+    let confirmed = false;
+
+    function submitSessionChange() {
+        let form = document.getElementById('stateForm')
+        let request = new XMLHttpRequest();
+        request.open(form.method, form.action, true);
+        request.onload = function () { // request successful
+            // we can use server response to our request now
+            console.log(request.response)
+            if (200 <= request.status && request.status <= 210) {
+                location.reload()
+            } else {
+                console.log(request.responseText);
+            }
+        };
+
+        request.send(new FormData(form));
+    }
+
+    function dummyFunc(event) {
+        event.preventDefault();
+    }
+</script>
 
 <script src="/static/js/sessionAutofill.js"></script>
 {{ template "footer.tmpl" . }}

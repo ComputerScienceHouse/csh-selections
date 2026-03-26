@@ -102,6 +102,9 @@ func (user OIDCUser) IsEboard() bool {
 }
 
 func (client *OIDCClient) GetActiveUsers() []OIDCUser {
+	if members, b := goCache.Get("activeMembers"); b {
+		return members.([]OIDCUser)
+	}
 	htclient := &http.Client{}
 	//active
 	req, err := http.NewRequest("GET", client.providerBase+"/auth/admin/realms/csh/groups/a97a191e-5668-43f5-bc0c-6eefc2b958a7/members", nil)
@@ -122,6 +125,7 @@ func (client *OIDCClient) GetActiveUsers() []OIDCUser {
 		log.Println("GetActiveUsers", err)
 		return nil
 	}
+	goCache.SetDefault("activeMembers", ret)
 	return ret
 }
 

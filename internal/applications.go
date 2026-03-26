@@ -119,6 +119,11 @@ func didUserRateApplication(applicationId uuid.UUID, username string) bool {
 	return tx.RowsAffected > 0
 }
 
+func dropAllApplications() {
+	clearBucket()
+	db.Where("1 = 1").Delete(&Application{})
+}
+
 func (app Application) Delete() error {
 	_, err := s3client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(env.BucketName),

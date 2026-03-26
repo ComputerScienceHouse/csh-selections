@@ -49,6 +49,7 @@ func main() {
 	router.POST("/session/manage", auth.AuthWrapper(HandleSessionChanging))
 	router.GET("/session/allMembers", auth.AuthWrapper(HandleSessionEligibleMemberList))
 	router.POST("/session/addMembers", auth.AuthWrapper(HandleSessionAddMembers))
+	router.POST("/session/removeMember", auth.AuthWrapper(HandleSessionRemoveMember))
 	router.POST("/session/createTeams", auth.AuthWrapper(HandleTeamCreation))
 
 	router.Run("localhost:8080")
