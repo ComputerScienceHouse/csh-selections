@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"strings"
 
 	loadenv "github.com/caarlos0/env/v11"
 	cshAuth "github.com/computersciencehouse/csh-auth"
@@ -52,5 +53,10 @@ func main() {
 	router.POST("/session/removeMember", auth.AuthWrapper(HandleSessionRemoveMember))
 	router.POST("/session/createTeams", auth.AuthWrapper(HandleTeamCreation))
 
-	router.Run("localhost:8080")
+	address := ":8080"
+	if strings.Contains(env.BaseUri, "localhost") {
+		address = "localhost" + address
+	}
+	router.Run(address)
+
 }
