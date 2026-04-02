@@ -30,9 +30,9 @@ func main() {
 	InitData()
 
 	router := gin.Default()
+	router.FuncMap = template.FuncMap{"len": Length, "appScore": GetApplicationScore}
 	router.LoadHTMLGlob("templates/*")
 	router.StaticFS("/static", http.Dir("static"))
-	router.FuncMap = template.FuncMap{"len": Length}
 	//Define routes here
 	router.GET("/auth/login", auth.AuthRequest)
 	router.GET("/auth/callback", auth.AuthCallback)
@@ -42,6 +42,7 @@ func main() {
 	router.POST("/admin/debug", auth.AuthWrapper(HandleDebugPost))
 	router.POST("/application/upload", auth.AuthWrapper(HandleApplicationFileUpload))
 	router.GET("/application/manage", auth.AuthWrapper(HandleApplicationManagementPage))
+	router.GET("/application/export", auth.AuthWrapper(HandleApplicationExport))
 	router.GET("/application/:id", auth.AuthWrapper(HandleApplicationGet))
 	router.POST("/application/:id/rate", auth.AuthWrapper(HandleApplicationRating))
 	router.DELETE("/application/:id", auth.AuthWrapper(HandleApplicationDelete))
@@ -52,6 +53,7 @@ func main() {
 	router.POST("/session/addMembers", auth.AuthWrapper(HandleSessionAddMembers))
 	router.POST("/session/removeMember", auth.AuthWrapper(HandleSessionRemoveMember))
 	router.POST("/session/createTeams", auth.AuthWrapper(HandleTeamCreation))
+	router.GET("/admin/debug/error", HandleDebugError)
 
 	address := ":8080"
 	if strings.Contains(env.BaseUri, "localhost") {

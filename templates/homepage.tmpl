@@ -21,7 +21,11 @@
         </div>
     </div>
     {{ if .SessionState }}
-        {{ if not .Rated }}
+        {{ if .Rated }}
+            <h5>You already rated this application. Please wait until your team is ready to be assigned a new application.</h5>
+        {{ else if eq .TeamApplication.ID .NilUUID }}
+            <h5>Your team does not yet have an application. Please refresh or talk to the advisor.</h5>
+        {{ else }}
             <div class="my-2 g-2 review-container d-flex flex-wrap container-lg flex-grow-1">
                 <object class="d-block flex-item mx-2 flex-grow-1" type="application/pdf"
                         data="{{ .TeamApplication.PresignedURL }}">
@@ -84,11 +88,10 @@
 
                 function checkRubric(event) {
                     let d = new FormData(event.target)
-                    console.log("hi")
                     for (const [key, value] of d.entries()) {
                         console.log(key, value)
                         if (parseInt(value) === 0 && !warn) {
-                            alert("At least one of your values are 0, are you sure you want to submit this form?")
+                            alert("At least one of your values are 0. Please double check your fields and resubmit.")
                             warn = true
                             event.preventDefault()
                             return
@@ -97,8 +100,6 @@
                     formSubmit(event)
                 }
             </script>
-        {{ else }}
-            <h5>You already rated this application. Please wait until your team is ready to be assigned a new application.</h5>
         {{ end }}
     {{ end }}
 {{ end }}

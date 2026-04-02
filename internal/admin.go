@@ -35,3 +35,7 @@ func HandleDebugPost(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, nil)
 }
+
+func HandleDebugError(c *gin.Context) {
+	c.JSON(http.StatusBadRequest, gin.H{"error": "You wanted an error"})
+}

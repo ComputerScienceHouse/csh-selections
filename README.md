@@ -21,11 +21,11 @@ podman run --rm -p 8080:8080 --env-file .env selections
 - [x] Applications can be added
 - [x] PDF Reader for applications (well, it uses browser PDF reading)
 - [x] Rubric on the side
-- [ ] Quickly exportable application score information
-- [ ] Application scores are viewable on admin page
+- [x] Quickly exportable application score information
+- [x] Application scores are viewable on admin page
 - [x] Selection stop button deletes applications, memberships, teams, and session_attendances
 - [x] Selection stop button requires confirmation
-- [ ] JSON error responses are displayed somehow
+- [x] JSON error responses are displayed somehow
 
 ## Further information
 none yet

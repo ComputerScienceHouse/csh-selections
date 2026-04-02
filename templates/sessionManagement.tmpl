@@ -1,92 +1,93 @@
 {{ template "header.tmpl" . }}
 <h1>Selections is currently <strong>{{ if .SessionState }}ACTIVE{{ else }}INACTIVE{{ end }}</strong>.</h1>
 <form id="stateForm" method="post" action="/session/manage" onsubmit="dummyFunc(event)">
-    <!--TODO: add confirm modal-->
-    <input name="state" value="{{ if .SessionState }}stop{{ else }}start{{ end }}" class="d-none">
-    <button class="btn btn-danger btn-large"{{ if .SessionState }} data-bs-toggle="modal" data-bs-target="#confirmStop">
-        STOP{{ else }}>START{{ end }} SESSION
-    </button>
+  <!--TODO: add confirm modal-->
+  <input name="state" value="{{ if .SessionState }}stop{{ else }}start{{ end }}" class="d-none">
+  <button class="btn btn-danger btn-large"{{ if .SessionState }} data-bs-toggle="modal" data-bs-target="#confirmStop">
+    STOP{{ else }}>START{{ end }} SESSION
+  </button>
 </form>
 {{ if not .SessionState }}
-    <div class="p-2 mt-4">
-        <h3>Add Members to this Selections Session</h3>
-        <form method="post" action="/session/addMembers" onsubmit="formSubmit(event)">
-            <div class="mb-3">
-                <label for="membersSelect" class="control-label">Members</label>
-                <input type="text" name="membersSelect" id="membersSelect" class="form-control"
-                       data-module="memberSelect">
-            </div>
-            <button class="btn btn-primary" type="submit">Add Members</button>
-        </form>
-    </div>
+  <div class="p-2 mt-4">
+    <h3>Add Members to this Selections Session</h3>
+    <form method="post" action="/session/addMembers" onsubmit="formSubmit(event)">
+      <div class="mb-3">
+        <label for="membersSelect" class="control-label">Members</label>
+        <input type="text" name="membersSelect" id="membersSelect" class="form-control"
+               data-module="memberSelect">
+      </div>
+      <button class="btn btn-primary" type="submit">Add Members</button>
+    </form>
+  </div>
 {{ end }}
 {{ if .Attendance }}
-    <div class="p-2 mt-4">
-        <h3>Members currently selected:</h3>
-        {{ range .Attendance }}
-            <span class="badge align-items-center p-2 text-body bg-primary-subtle border border-primary-subtle">
+  <div class="p-2 mt-4">
+    <h3>Members currently selected:</h3>
+      {{ range .Attendance }}
+        <span class="badge align-items-center p-2 text-body bg-primary-subtle border border-primary-subtle">
                     {{.FullName}} ({{.Username}})
                     <a style="color: inherit; text-decoration: none" href="javascript:removeMember('{{.Username}}')"
                        tabindex="-1"
                        title="Remove">×
                     </a></span>
-        {{ end }}
-        {{ if not .SessionState }}
-            <form class="mt-2" method="post" action="/session/createTeams" onsubmit="formSubmit(event)">
-                <div class="mb-2 row">
-                    <div class="col-auto">
-                        <label class="col-form-label" for="teamCount">How many Teams?</label>
-                    </div>
-                    <div class="col-auto">
-                        <input class="form-control" id="teamCount" name="teamCount" type="number" min="1"
-                               max="{{ .EBoard }}" value="{{ .EBoard }}">
-                    </div>
-                </div>
-                <button class="btn btn-primary" type="submit">Create Teams</button>
-            </form>
-        {{ end }}
-    </div>
+      {{ end }}
+      {{ if not .SessionState }}
+        <form class="mt-2" method="post" action="/session/createTeams" onsubmit="formSubmit(event)">
+          <div class="mb-2 row">
+            <div class="col-auto">
+              <label class="col-form-label" for="teamCount">How many Teams?</label>
+            </div>
+            <div class="col-auto">
+              <input class="form-control" id="teamCount" name="teamCount" type="number" min="1"
+                     max="{{ .EBoard }}" value="{{ .EBoard }}">
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Create Teams</button>
+        </form>
+      {{ end }}
+  </div>
 {{ end }}
 <div class="p-2 mt-4">
-    <h2>Teams</h2>
+  <h2>Teams</h2>
     {{ if .Teams }}
         {{ range .Teams }}
-            <div class="card mt-2 mb-2">
-                <div class="card-body">
-                    <h4 class="card-title">Team {{.ID}}</h4>
-                    <div class="row">
-                        {{ range .Members }}
-                            <div class="col-4 col-md-2">
-                                <img src="https://profiles.csh.rit.edu/image/{{ .Username }}" class="rounded-circle"
-                                     width="60" height="60" style="display:block; margin: 20px auto 0;">
-                                <div style="text-align:center">
-                                    {{ .Username }}
-                                </div>
-                            </div>
-                        {{ end }}
+          <div class="card mt-2 mb-2">
+            <div class="card-body">
+              <h4 class="card-title">Team {{.ID}}</h4>
+              <div class="row">
+                  {{ range .Members }}
+                    <div class="col-4 col-md-2">
+                      <img src="https://profiles.csh.rit.edu/image/{{ .Username }}" class="rounded-circle"
+                           width="60" height="60" style="display:block; margin: 20px auto 0;">
+                      <div style="text-align:center">
+                          {{ .Username }}
+                      </div>
                     </div>
-                </div>
+                  {{ end }}
+              </div>
             </div>
+          </div>
         {{ end }}
     {{ else }}
-        <span>There currently aren't any teams. Add some members to the session and then create teams!</span>
+      <span>There currently aren't any teams. Add some members to the session and then create teams!</span>
     {{ end }}
 </div>
 <div class="modal fade" id="confirmStop" tabindex="-1">
-    <div class="modal-dialog modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Stopping Selections Session</h5>
-        </div>
-        <div class="modal-body">
-            <p>Are you sure you want to stop this session?<br>
-                This will delete <strong>ALL applications and teams</strong>.
-            </p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-danger" onclick="submitSessionChange()">Stop Selections</button>
-        </div>
+  <div class="modal-dialog modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Stopping Selections Session</h5>
     </div>
+    <div class="modal-body">
+      <p>Are you sure you want to stop this session?<br>
+        This will delete <strong>ALL applications and teams</strong>.<br>
+        Make sure you exported all scoring data first!
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn" data-bs-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-danger" onclick="submitSessionChange()">Stop Selections</button>
+    </div>
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"></script>
 <link
@@ -138,7 +139,9 @@
     }
 
     function dummyFunc(event) {
-        event.preventDefault();
+        if ({{ .SessionState }}) {
+            formSubmit(event)
+        }
     }
 </script>
 

@@ -103,7 +103,7 @@ func getTeamByID(ID uuid.UUID) *Team {
 
 func dropAllTeams() {
 	tx := db.Where("1 = 1").Delete(&Membership{})
-	fmt.Println(tx.RowsAffected, tx.Error)
+	fmt.Println("Deleted # of Teams: ", tx.RowsAffected, tx.Error)
 	db.Where("1 = 1").Delete(&Team{})
 }
 

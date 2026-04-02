@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -139,7 +138,6 @@ func HandleSessionAddMembers(c *gin.Context) {
 func HandleSessionRemoveMember(c *gin.Context) {
 	json := map[string]string{"member": ""}
 	err := c.ShouldBindJSON(&json)
-	fmt.Println(json)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

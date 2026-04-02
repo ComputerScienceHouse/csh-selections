@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
 	"log"
 	"mime/multipart"
@@ -19,8 +20,8 @@ import (
 type Application struct {
 	ID           uuid.UUID `gorm:"primarykey"`
 	Assigned     bool
-	Ratings      []Rating `gorm:"-"`
-	PresignedURL string   `gorm:"-"`
+	Ratings      *[]Rating `gorm:"-"`
+	PresignedURL string    `gorm:"-"`
 }
 
 type Rating struct {
@@ -93,15 +94,30 @@ func getApplications() []*Application {
 	res := make([]*Application, 0)
 	db.Find(&res)
 	for _, app := range res {
-		app.PresignedURL = app.GetPresignedURL()
+		app.GetPresignedURL()
+		app.GetRatings()
 	}
 	return res
 }
 
 func getApplication(uuid uuid.UUID) *Application {
 	res := Application{ID: uuid}
-	res.PresignedURL = res.GetPresignedURL()
+	res.GetPresignedURL()
+	res.GetRatings()
 	return &res
+}
+
+func GetApplicationScore(uuid uuid.UUID) int {
+	application := getApplication(uuid)
+	rateLen := len(*application.Ratings)
+	if rateLen == 0 {
+		return 0
+	}
+	score := 0
+	for _, rating := range *application.Ratings {
+		score += rating.Score
+	}
+	return score / rateLen
 }
 
 func getCriteria() []Criterion {
@@ -124,7 +140,7 @@ func dropAllApplications() {
 	db.Where("1 = 1").Delete(&Application{})
 }
 
-func (app Application) Delete() error {
+func (app *Application) Delete() error {
 	_, err := s3client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(env.BucketName),
 		Key:    aws.String(app.ID.String() + ".pdf")})
@@ -135,7 +151,7 @@ func (app Application) Delete() error {
 	return nil
 }
 
-func (app Application) GetPresignedURL() string {
+func (app *Application) GetPresignedURL() {
 	res, err := s3presign.PresignGetObject(context.Background(), &s3.GetObjectInput{
 		Bucket: aws.String(env.BucketName),
 		Key:    aws.String(app.ID.String() + ".pdf"),
@@ -144,9 +160,16 @@ func (app Application) GetPresignedURL() string {
 	})
 	if err != nil {
 		log.Println("Failed while presigning application url", err)
-		return ""
+		app.PresignedURL = ""
 	}
-	return res.URL
+	app.PresignedURL = res.URL
+}
+
+func (app *Application) GetRatings() {
+	db.Find(&app.Ratings, Rating{ApplicationID: app.ID})
+	if app.Ratings == nil {
+		app.Ratings = &[]Rating{}
+	}
 }
 
 /* ============
@@ -176,7 +199,7 @@ func HandleApplicationGet(c *gin.Context) {
 		return
 	}
 	app := Application{ID: id}
-	c.JSON(http.StatusOK, map[string]any{"url": app.GetPresignedURL()})
+	c.JSON(http.StatusOK, map[string]any{"url": app.PresignedURL})
 }
 
 // POST Requests
@@ -223,7 +246,8 @@ func HandleApplicationDelete(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err = Application{ID: id}.Delete()
+	app := &Application{ID: id}
+	err = app.Delete()
 	if err != nil {
 		log.Println("Error deleting application", id, err)
 		return
@@ -265,5 +289,25 @@ func HandleApplicationRating(c *gin.Context) {
 		Score:         totalScore,
 	}
 	db.Save(&rating)
-	application.Ratings = append(application.Ratings, rating)
+	*application.Ratings = append(*application.Ratings, rating)
+}
+
+func HandleApplicationExport(c *gin.Context) {
+	if !isUserAdmin(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	filename := "CSH_SELECTIONS_" + time.Now().Format(time.DateOnly) + ".csv"
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Header("Content-Type", "text/csv")
+	csvOut := csv.NewWriter(c.Writer)
+	csvOut.Write([]string{"ApplicationID", "Score"}) // Headers
+	for _, application := range getApplications() {
+		err := csvOut.Write([]string{application.ID.String(), strconv.Itoa(GetApplicationScore(application.ID))})
+		if err != nil {
+			log.Println("Failed to write to csv", err)
+			return
+		}
+	}
+	csvOut.Flush()
 }

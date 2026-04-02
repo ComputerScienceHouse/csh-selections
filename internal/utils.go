@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"log"
 	"reflect"
 	"slices"
 
@@ -24,7 +23,6 @@ func templateHeaders(c *gin.Context, data ...map[string]any) gin.H {
 func Length(item any) int {
 	defer func() {
 		recover()
-		log.Println("item", item, "length could not be calculated")
 	}()
 	ret := 0
 	ret = reflect.ValueOf(item).Len()
