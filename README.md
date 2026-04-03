@@ -9,9 +9,7 @@ podman run --rm -p 8080:8080 --env-file .env selections
 ``` 
 
 ### Features Implemented
-- Autofill for users to add to the Session
-
-### Features Planned
+- [x] Autofill for users to add to the Session
 - [x] Automatic Team Creation
   - [x] Team count can be lowered, but maximum team count is # of E-Board members
   - [x] At least one E-Board member per team
@@ -26,6 +24,7 @@ podman run --rm -p 8080:8080 --env-file .env selections
 - [x] Selection stop button deletes applications, memberships, teams, and session_attendances
 - [x] Selection stop button requires confirmation
 - [x] JSON error responses are displayed somehow
+- [x] ResLife has the ability to login
 
 ## Further information
 none yet

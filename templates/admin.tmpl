@@ -1,0 +1,6 @@
+{{ template "header.tmpl" . }}
+<h3>ResLife Auth Code: <code>{{ .ResLifeCode }}</code></h3>
+<form action="/admin/newCode" method="post" onsubmit="formSubmit(event)">
+    <button type="submit" class="btn btn-warning">New Code</button>
+</form>
+{{ template "footer.tmpl" . }}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>ResLife Login | Selections</title>
+  <link rel="stylesheet"
+        href="https://assets.csh.rit.edu/csh-material-bootstrap/5.3.8/dist/css/bootstrap.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{if .Css }}
+      <link rel="stylesheet" href="/static/css/{{ .Css }}">
+    {{ end }}
+  <script src="https://assets.csh.rit.edu/csh-material-bootstrap/5.3.8/dist/js/color-modes.js"></script>
+</head>
+<body class="min-vh-100">
+<div class="position-fixed top-50 start-50 translate-middle card">
+  <div class="card-body m-2">
+    <h2 class="mb-4">Login With Auth Code</h2>
+    <form method="post" target="/rl/login">
+      <div class="input-group my-2">
+        <label class="input-group-text" for="authcode">Auth code:</label>
+        <input class="form-control" id="authcode" name="authcode" type="text" placeholder="abcdefg">
+      </div>
+      <button class="btn btn-primary">Login</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

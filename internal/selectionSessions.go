@@ -166,13 +166,6 @@ func HandleSessionEligibleMemberList(c *gin.Context) {
 	c.JSON(http.StatusOK, members)
 }
 
-func HandleSessionAttendingList(c *gin.Context) {
-	if !isUserAdmin(c) {
-		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
-		return
-	}
-}
-
 func HandleSessionChanging(c *gin.Context) {
 	user := getUserData(c)
 	if !isUserAdmin(c) {

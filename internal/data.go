@@ -68,6 +68,11 @@ func InitData() {
 		log.Println("Couldn't migrate Criteria table:", err)
 		return
 	}
+	err = db.AutoMigrate(&RLAuthCode{})
+	if err != nil {
+		log.Println("Couldn't migrate RLAuthCode table:", err)
+		return
+	}
 
 	s3config, err := awsconfig.LoadDefaultConfig(context.Background())
 	if err != nil {

@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"net/http"
 	"reflect"
 	"slices"
 
@@ -30,12 +31,44 @@ func Length(item any) int {
 }
 
 func getUserData(c *gin.Context) cshAuth.CSHUserInfo {
-	cl, _ := c.Get("cshauth")
+	cl, b := c.Get("cshauth")
+	if !b {
+		return cshAuth.CSHUserInfo{
+			Username: "ResLifeUser",
+			FullName: "ResLife Staff",
+			Groups:   []string{"reslife"},
+		}
+	}
 	user := cl.(cshAuth.CSHClaims).UserInfo
 	return user
 }
 
 func isUserAdmin(c *gin.Context) bool {
 	user := getUserData(c)
-	return slices.Contains(user.Groups, "eboard-evaluations") || slices.Contains(user.Groups, "active_rtp")
+	return slices.Contains(user.Groups, "eboard-evaluations") ||
+		slices.Contains(user.Groups, "active_rtp") ||
+		slices.Contains(user.Groups, "reslife")
+}
+
+// auth for advisors or admins
+func PaulthWrapper(auth cshAuth.CSHAuth, h gin.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// look for CSH auth
+		cookie, err := c.Cookie(cshAuth.CookieName)
+		if cookie != "" && err == nil {
+			auth.AuthWrapper(h)
+			return
+		}
+		// roll our own
+		cookie, err = c.Cookie("RLAuth")
+		if cookie == "" || err != nil {
+			c.Redirect(http.StatusTemporaryRedirect, "/rl/login")
+			return
+		}
+		if cookie == getResLifeCode() {
+			h(c)
+			return
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+	}
 }
