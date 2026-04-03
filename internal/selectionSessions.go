@@ -169,14 +169,14 @@ func HandleSessionEligibleMemberList(c *gin.Context) {
 func HandleSessionChanging(c *gin.Context) {
 	user := getUserData(c)
 	if !isUserAdmin(c) {
-		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "You're not authorized to access this page!"})
 		return
 	}
 	if res, ok := c.GetPostForm("state"); ok {
 		switch res {
 		case "start":
 			if len(getAllTeams()) < 1 {
-				c.JSON(http.StatusBadRequest, "You cannot start with 0 teams!")
+				c.JSON(http.StatusBadRequest, gin.H{"error": "You cannot start with 0 teams!"})
 				return
 			}
 			setSelectionsState(true, user.Username)

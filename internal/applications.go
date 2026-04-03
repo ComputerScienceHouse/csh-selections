@@ -183,6 +183,7 @@ func HandleApplicationManagementPage(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, nil)
 		return
 	}
+	fmt.Println("hello")
 	c.HTML(http.StatusOK, "applicationManagement.tmpl", templateHeaders(c, map[string]any{"Applications": getApplications(), "Teams": getAllTeams()}))
 }
 

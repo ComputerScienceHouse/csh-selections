@@ -1,7 +1,6 @@
 {{ template "header.tmpl" . }}
 <h1>Selections is currently <strong>{{ if .SessionState }}ACTIVE{{ else }}INACTIVE{{ end }}</strong>.</h1>
 <form id="stateForm" method="post" action="/session/manage" onsubmit="dummyFunc(event)">
-  <!--TODO: add confirm modal-->
   <input name="state" value="{{ if .SessionState }}stop{{ else }}start{{ end }}" class="d-none">
   <button class="btn btn-danger btn-large"{{ if .SessionState }} data-bs-toggle="modal" data-bs-target="#confirmStop">
     STOP{{ else }}>START{{ end }} SESSION
@@ -139,8 +138,11 @@
     }
 
     function dummyFunc(event) {
-        if ({{ .SessionState }}) {
+        console.log("hi")
+        if ({{ not .SessionState }}) {
             formSubmit(event)
+        } else {
+            event.preventDefault()
         }
     }
 </script>

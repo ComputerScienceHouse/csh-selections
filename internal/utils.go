@@ -56,7 +56,7 @@ func PaulthWrapper(auth cshAuth.CSHAuth, h gin.HandlerFunc) gin.HandlerFunc {
 		// look for CSH auth
 		cookie, err := c.Cookie(cshAuth.CookieName)
 		if cookie != "" && err == nil {
-			auth.AuthWrapper(h)
+			auth.AuthWrapper(h)(c)
 			return
 		}
 		// roll our own

@@ -51,8 +51,9 @@
   <tbody>
   {{ range .Applications }}
     <tr>
-      <td class="align-middle text-center text-nowrap font-monospace"><a href="{{.PresignedURL}}"
-                                                                         target="_blank">{{.ID}}</a></td>
+      <td class="align-middle text-center text-nowrap font-monospace">
+        <a href="{{.PresignedURL}}" target="_blank">{{.ID}}</a>
+      </td>
       <td class="align-middle text-center text-nowrap">
           {{ appScore .ID }}
       </td>
