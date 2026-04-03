@@ -1,4 +1,4 @@
-FROM docker.io/golang:1.24-alpine AS build
+FROM docker.io/golang:1.25-alpine AS build
 WORKDIR /src/
 RUN apk add git
 COPY go.* .
