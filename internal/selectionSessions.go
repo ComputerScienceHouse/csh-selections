@@ -63,7 +63,7 @@ func dropAllAttendance() {
 
 func getAttendingMembers() ([]OIDCUser, int) {
 	var attendingMembers []SessionAttendance
-	db.Order("is_eboard").Find(&attendingMembers)
+	db.Order("is_eboard DESC").Find(&attendingMembers)
 	eboard := 0
 	ret := make([]OIDCUser, len(attendingMembers))
 	for i, member := range attendingMembers {
