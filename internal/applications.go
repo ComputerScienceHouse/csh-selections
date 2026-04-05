@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -165,6 +166,25 @@ func (app *Application) GetPresignedURL() {
 	app.PresignedURL = res.URL
 }
 
+func (app *Application) GetApplicationData() []byte {
+	ret := make([]byte, 0)
+	objectRes, err := s3client.GetObject(context.Background(), &s3.GetObjectInput{
+		Bucket: aws.String(env.BucketName),
+		Key:    aws.String(app.ID.String() + ".pdf"),
+	})
+	if err != nil {
+		log.Println("Failed while getting application data", err)
+		return ret
+	}
+	all, err := io.ReadAll(objectRes.Body)
+	if err != nil {
+		log.Println("Failed while reading application data", err)
+		return ret
+	}
+	//ret = base64.StdEncoding.EncodeToString(all)
+	return all
+}
+
 func (app *Application) GetRatings() {
 	db.Find(&app.Ratings, Rating{ApplicationID: app.ID})
 	if app.Ratings == nil {
@@ -183,7 +203,6 @@ func HandleApplicationManagementPage(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, nil)
 		return
 	}
-	fmt.Println("hello")
 	c.HTML(http.StatusOK, "applicationManagement.tmpl", templateHeaders(c, map[string]any{"Applications": getApplications(), "Teams": getAllTeams()}))
 }
 
@@ -195,12 +214,14 @@ func HandleApplicationGet(c *gin.Context) {
 		return
 	}
 	user := getUserData(c)
-	if getTeamForMember(user.Username).ApplicationID != id || !isUserAdmin(c) {
+	if !(getTeamForMember(user.Username).ApplicationID == id || isUserAdmin(c)) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 	app := Application{ID: id}
-	c.JSON(http.StatusOK, map[string]any{"url": app.PresignedURL})
+	//c.JSON(http.StatusOK, map[string]any{"data": app.GetApplicationData()})
+	c.Writer.Header().Set("Content-Type", "application/pdf")
+	c.Writer.Write(app.GetApplicationData())
 }
 
 // POST Requests
@@ -262,7 +283,7 @@ func HandleApplicationRating(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 	}
 	user := getUserData(c)
-	if getTeamForMember(user.Username).ApplicationID != id || !isUserAdmin(c) {
+	if !(getTeamForMember(user.Username).ApplicationID == id || isUserAdmin(c)) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
