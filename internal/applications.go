@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -72,9 +71,6 @@ func listBucketApplications() []types.Object {
 			return nil
 		}
 		ret = append(ret, output.Contents...)
-		for _, item := range output.Contents {
-			fmt.Println("\t", *item.Key, item.LastModified, *item.Size)
-		}
 	}
 	return ret
 }
@@ -93,7 +89,7 @@ func clearBucket() {
 
 func getApplications() []*Application {
 	res := make([]*Application, 0)
-	db.Find(&res)
+	db.Order("id").Find(&res)
 	for _, app := range res {
 		app.GetPresignedURL()
 		app.GetRatings()

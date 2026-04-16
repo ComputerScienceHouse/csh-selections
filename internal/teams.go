@@ -87,7 +87,7 @@ func (t *Team) setTeamApplication(appID uuid.UUID) {
 
 func getAllTeams() []*Team {
 	var teams []*Team
-	db.Find(&teams)
+	db.Order("id").Find(&teams)
 	for _, team := range teams {
 		team.getTeamMembership()
 	}

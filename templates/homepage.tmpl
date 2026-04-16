@@ -93,7 +93,8 @@
                 for (const [key, value] of d.entries()) {
                     console.log(key, value)
                     if (parseInt(value) === 0 && !warn) {
-                        alert("At least one of your values are 0. Please double check your fields and resubmit.")
+                        alert("At least one of your values are 0. Please double check your scores were intentional. " +
+                            "If you are sure, you can resubmit as-is.")
                         warn = true
                         event.preventDefault()
                         return

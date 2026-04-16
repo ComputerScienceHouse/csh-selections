@@ -1,5 +1,9 @@
 function formSubmit(event) {
-    event.preventDefault();
+    try {
+        event.preventDefault();
+    } catch (e) {
+        
+    }
     let form = event.target;
     if (!form.reportValidity()) {
         return

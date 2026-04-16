@@ -21,7 +21,7 @@
           {{ end }}
       </td>
       <td>
-        <form action="/team/{{ .ID }}/assign" method="POST" onsubmit="formSubmit(event)">
+        <form action="/team/{{ .ID }}/assign" method="POST" onsubmit="validateAndSubmit(event)">
           <select required name="applicationID">
             <option disabled selected>Assign Application</option>
               {{ range $.Applications }}
@@ -37,7 +37,7 @@
   {{ end }}
   </tbody>
 </table>
-<span>Note: the "Apply" button will not automatically update the page - press ALL "Apply" buttons, and then reload the page to see your changes.</span>
+<button class="btn btn-success me-auto" type="submit" onclick="applyAll()">Apply All</button>
 <h2 class="mt-5">Uploaded Applications</h2>
 <span>There are currently {{ len .Applications }} applications.</span>
 <table class="table" id="applications">
@@ -81,8 +81,32 @@
     forms.forEach(function (form) {
         form.firstElementChild.addEventListener('change', event => {
             event.target.nextElementSibling.classList.remove("d-none")
-            event.target.firstElementChild.remove()
         })
+        form.firstElementChild.firstElementChild.selected = true
+        form.firstElementChild.setCustomValidity("A value needs selected")
     })
+
+    function validateAndSubmit(event) {
+        let select = event.target.firstElementChild
+        if (select.value !== "Assign Application") {
+            console.log(select.value)
+            select.setCustomValidity("")
+            formSubmit(event)
+        }
+        try {
+            event.preventDefault()
+        } catch (e) {
+            
+        }
+        console.log("womp womp")
+    }
+
+    function applyAll() {
+        let forms = document.querySelectorAll('#team-assignments > tbody > tr > td:nth-child(3) > form')
+        forms.forEach(function (form) {
+            console.log(form.checkValidity())
+            validateAndSubmit({"target": form});
+        })
+    }
 </script>
 {{ template "footer.tmpl" . }}
