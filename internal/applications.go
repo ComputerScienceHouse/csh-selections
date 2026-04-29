@@ -117,6 +117,18 @@ func GetApplicationScore(uuid uuid.UUID) int {
 	return score / rateLen
 }
 
+func getApplicationScores(uuid uuid.UUID) []int {
+	ret := make([]int, 0)
+	application := getApplication(uuid)
+	if len(*application.Ratings) == 0 {
+		return ret
+	}
+	for i, rating := range *application.Ratings {
+		ret[i] = rating.Score
+	}
+	return ret
+}
+
 func getCriteria() []Criterion {
 	if ret, b := goCache.Get("criteria"); b {
 		return ret.([]Criterion)
@@ -319,9 +331,14 @@ func HandleApplicationExport(c *gin.Context) {
 	c.Header("Content-Disposition", "attachment; filename="+filename)
 	c.Header("Content-Type", "text/csv")
 	csvOut := csv.NewWriter(c.Writer)
-	csvOut.Write([]string{"ApplicationID", "Score"}) // Headers
+	csvOut.Write([]string{"ApplicationID", "Total", "Score By Member"}) // Headers
 	for _, application := range getApplications() {
-		err := csvOut.Write([]string{application.ID.String(), strconv.Itoa(GetApplicationScore(application.ID))})
+		out := []string{application.ID.String(), strconv.Itoa(GetApplicationScore(application.ID))}
+		// append the scores one by one to the output
+		for _, val := range getApplicationScores(application.ID) {
+			out = append(out, strconv.Itoa(val))
+		}
+		err := csvOut.Write(out)
 		if err != nil {
 			log.Println("Failed to write to csv", err)
 			return
