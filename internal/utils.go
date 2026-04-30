@@ -30,6 +30,17 @@ func Length(item any) int {
 	return ret
 }
 
+func Loop(count int) <-chan int {
+	ch := make(chan int)
+	go func() {
+		for i := 0; i <= count; i++ {
+			ch <- i
+		}
+		close(ch)
+	}()
+	return ch
+}
+
 func getUserData(c *gin.Context) cshAuth.CSHUserInfo {
 	cl, b := c.Get("cshauth")
 	if !b {

@@ -14,19 +14,18 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type Application struct {
-	ID           uuid.UUID `gorm:"primarykey"`
+	ID           int `gorm:"primarykey;autoIncrement"`
 	Assigned     bool
 	Ratings      *[]Rating `gorm:"-"`
 	PresignedURL string    `gorm:"-"`
 }
 
 type Rating struct {
-	ApplicationID uuid.UUID `gorm:"primarykey"`
-	Member        string    `gorm:"primarykey"`
+	ApplicationID int    `gorm:"primarykey"`
+	Member        string `gorm:"primarykey"`
 	SubmittedTime time.Time
 	Score         int
 }
@@ -46,18 +45,23 @@ func (Criterion) TableName() string {
 ACTUAL FUNCTIONS GO HERE
 			============= */
 
-func uploadApplication(file multipart.File) (Application, error) {
-	app := Application{ID: uuid.New()}
+func uploadApplication(appID int, file multipart.File) (Application, error) {
+	//tx := db.Where("1 = 1").Find(&[]Application{})
+	app := Application{ID: appID} //int(tx.RowsAffected + 1)
 	_, err := s3client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket: aws.String(env.BucketName),
-		Key:    aws.String(app.ID.String() + ".pdf"),
+		Key:    aws.String(strconv.Itoa(app.ID) + ".pdf"),
 		Body:   file,
 	})
 	if err != nil {
 		log.Println("Failed while uploading application", err)
-		return Application{ID: uuid.UUID{}}, err
+		return Application{}, err
 	}
-	db.Create(&app)
+	tx := db.Create(&app)
+	if tx.Error != nil {
+		log.Println("Failed while add application to DB", tx.Error)
+		return Application{}, tx.Error
+	}
 	return app, nil
 }
 
@@ -97,15 +101,15 @@ func getApplications() []*Application {
 	return res
 }
 
-func getApplication(uuid uuid.UUID) *Application {
-	res := Application{ID: uuid}
+func getApplication(id int) *Application {
+	res := Application{ID: id}
 	res.GetPresignedURL()
 	res.GetRatings()
 	return &res
 }
 
-func GetApplicationScore(uuid uuid.UUID) int {
-	application := getApplication(uuid)
+func GetApplicationScore(id int) int {
+	application := getApplication(id)
 	rateLen := len(*application.Ratings)
 	if rateLen == 0 {
 		return 0
@@ -117,14 +121,14 @@ func GetApplicationScore(uuid uuid.UUID) int {
 	return score / rateLen
 }
 
-func getApplicationScores(uuid uuid.UUID) []int {
+func getApplicationScores(id int) []int {
 	ret := make([]int, 0)
-	application := getApplication(uuid)
+	application := getApplication(id)
 	if len(*application.Ratings) == 0 {
 		return ret
 	}
-	for i, rating := range *application.Ratings {
-		ret[i] = rating.Score
+	for _, rating := range *application.Ratings {
+		ret = append(ret, rating.Score)
 	}
 	return ret
 }
@@ -139,7 +143,7 @@ func getCriteria() []Criterion {
 	return res
 }
 
-func didUserRateApplication(applicationId uuid.UUID, username string) bool {
+func didUserRateApplication(applicationId int, username string) bool {
 	tx := db.Find(&Rating{ApplicationID: applicationId, Member: username})
 	return tx.RowsAffected > 0
 }
@@ -152,7 +156,7 @@ func dropAllApplications() {
 func (app *Application) Delete() error {
 	_, err := s3client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(env.BucketName),
-		Key:    aws.String(app.ID.String() + ".pdf")})
+		Key:    aws.String(strconv.Itoa(app.ID) + ".pdf")})
 	if err != nil {
 		return err
 	}
@@ -163,7 +167,7 @@ func (app *Application) Delete() error {
 func (app *Application) GetPresignedURL() {
 	res, err := s3presign.PresignGetObject(context.Background(), &s3.GetObjectInput{
 		Bucket: aws.String(env.BucketName),
-		Key:    aws.String(app.ID.String() + ".pdf"),
+		Key:    aws.String(strconv.Itoa(app.ID) + ".pdf"),
 	}, func(options *s3.PresignOptions) {
 		options.Expires = time.Minute
 	})
@@ -178,7 +182,7 @@ func (app *Application) GetApplicationData() []byte {
 	ret := make([]byte, 0)
 	objectRes, err := s3client.GetObject(context.Background(), &s3.GetObjectInput{
 		Bucket: aws.String(env.BucketName),
-		Key:    aws.String(app.ID.String() + ".pdf"),
+		Key:    aws.String(strconv.Itoa(app.ID) + ".pdf"),
 	})
 	if err != nil {
 		log.Println("Failed while getting application data", err)
@@ -211,11 +215,33 @@ func HandleApplicationManagementPage(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, nil)
 		return
 	}
-	c.HTML(http.StatusOK, "applicationManagement.tmpl", templateHeaders(c, map[string]any{"Applications": getApplications(), "Teams": getAllTeams()}))
+	teams := getAllTeams()
+	biggestTeam := 0
+	for _, team := range teams {
+		clen := len(team.Members) // one of these days I'll stop naming the temporary variables something stupid
+		if clen > biggestTeam {
+			biggestTeam = clen
+		}
+	}
+	allScores := make(map[int][]int)
+	totalScores := make([]int, 0)
+	apps := getApplications()
+	for _, app := range apps {
+		allScores[app.ID] = getApplicationScores(app.ID)
+		totalScores = append(totalScores, GetApplicationScore(app.ID))
+	}
+
+	c.HTML(http.StatusOK, "applicationManagement.tmpl", templateHeaders(c, map[string]any{
+		"Applications":      apps,
+		"Teams":             teams,
+		"BiggestTeam":       biggestTeam,
+		"ApplicationScores": allScores,
+		"TotalScores":       totalScores,
+	}))
 }
 
 func HandleApplicationGet(c *gin.Context) {
-	id, err := uuid.Parse(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println("Failed while parsing application id", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -239,25 +265,35 @@ func HandleApplicationFileUpload(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
+	appID, ok := c.GetPostForm("applicationID")
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing applicationID"})
+		return
+	}
+	atoi, err := strconv.Atoi(appID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": appID + " is not an integer."})
+		return
+	}
 	fileH, err := c.FormFile("applicationFile")
 	if err != nil {
 		log.Println("Something went wrong with the application upload.\n\t", err)
-		c.JSON(http.StatusBadRequest, "Something went wrong with the application upload. Please try again.")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Something went wrong with the application upload. Please try again."})
 		return
 	}
 	if fileH.Header.Get("Content-Type") != "application/pdf" {
-		c.JSON(http.StatusBadRequest, "You did not upload a PDF. Please upload a PDF.")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You did not upload a PDF. Please upload a PDF."})
 		return
 	}
 	file, err := fileH.Open()
 	if err != nil {
 		log.Println("Failed to get file from application upload", err)
-		c.JSON(http.StatusBadRequest, "Something was wrong with the application upload. Please try again.")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Something was wrong with the application upload. Please try again."})
 	}
 
-	_, err = uploadApplication(file)
+	_, err = uploadApplication(atoi, file)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -270,7 +306,7 @@ func HandleApplicationDelete(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
-	id, err := uuid.Parse(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println("Failed while parsing application id", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -285,7 +321,7 @@ func HandleApplicationDelete(c *gin.Context) {
 }
 
 func HandleApplicationRating(c *gin.Context) {
-	id, err := uuid.Parse(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println("Failed while parsing application id", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -333,7 +369,7 @@ func HandleApplicationExport(c *gin.Context) {
 	csvOut := csv.NewWriter(c.Writer)
 	csvOut.Write([]string{"ApplicationID", "Total", "Score By Member"}) // Headers
 	for _, application := range getApplications() {
-		out := []string{application.ID.String(), strconv.Itoa(GetApplicationScore(application.ID))}
+		out := []string{strconv.Itoa(application.ID), strconv.Itoa(GetApplicationScore(application.ID))}
 		// append the scores one by one to the output
 		for _, val := range getApplicationScores(application.ID) {
 			out = append(out, strconv.Itoa(val))

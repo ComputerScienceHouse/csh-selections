@@ -3,4 +3,8 @@
 <form action="/admin/newCode" method="post" onsubmit="formSubmit(event)">
     <button type="submit" class="btn btn-warning">New Code</button>
 </form>
+<form class="m-2" method="post" action="/admin/debug" onsubmit="formSubmit(event)">
+    <input type="radio" name="debugAction" value="ClearCache" class="d-none" checked>
+    <button class="btn btn-primary" type="submit">Clear Cache</button>
+</form>
 {{ template "footer.tmpl" . }}

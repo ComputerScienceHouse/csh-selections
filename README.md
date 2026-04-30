@@ -6,6 +6,7 @@ Copy .env.example to .env, and fill out the variables as needed.
 ```
 podman build . --tag=selections
 podman run --rm -p 8080:8080 --env-file .env selections
+podman run --rm -p 5432:5432 -v ./volume:/var/lib/postgresql/data -e POSTGRES_USER=selections -e POSTGRES_PASSWORD=selectionspassword -e POSTGRES_DB=selections docker.io/postgres:16
 ``` 
 
 ### Features Implemented

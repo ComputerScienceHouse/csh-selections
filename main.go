@@ -30,7 +30,21 @@ func main() {
 	InitData()
 
 	router := gin.Default()
-	router.FuncMap = template.FuncMap{"len": Length, "appScore": GetApplicationScore}
+	router.FuncMap = template.FuncMap{
+		"len":  Length,
+		"loop": Loop,
+		"add": func(a int, b ...int) int {
+			for _, i := range b {
+				a += i
+			}
+			return a
+		},
+		"safeIndex": func(s []int, i int) int {
+			if i < len(s) {
+				return s[i]
+			}
+			return -1
+		}}
 	router.LoadHTMLGlob("templates/*")
 	router.StaticFS("/static", http.Dir("static"))
 	//Define routes here

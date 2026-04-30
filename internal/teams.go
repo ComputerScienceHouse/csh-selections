@@ -8,18 +8,17 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type Team struct {
-	ID            uuid.UUID  `gorm:"primarykey"`
-	ApplicationID uuid.UUID  `gorm:"refrences:Application,ID"`
+	ID            int        `gorm:"primarykey"`
+	ApplicationID int        `gorm:"references:Application,ID"`
 	Members       []OIDCUser `gorm:"-"`
 }
 
 type Membership struct {
-	TeamID uuid.UUID `gorm:"primarykey;references:TeamID,ID"`
-	Member string    `gorm:"primarykey"`
+	TeamID int    `gorm:"primarykey;references:TeamID,ID"`
+	Member string `gorm:"primarykey"`
 }
 
 /* ==============
@@ -27,7 +26,8 @@ ACTUAL FUNCTIONS GO HERE
 			============= */
 
 func createTeam() Team {
-	ret := Team{ID: uuid.New()}
+	tx := db.Where("1 = 1").Find(&[]Team{})
+	ret := Team{ID: int(tx.RowsAffected + 1)}
 	db.Create(&ret)
 	return ret
 }
@@ -43,7 +43,7 @@ func getTeamForMember(member string) *Team {
 }
 
 func isMemberOnTeam(member string) bool {
-	return getTeamForMember(member).ID != uuid.UUID{}
+	return getTeamForMember(member).ID != 0
 }
 
 func (t *Team) getTeamMembership() {
@@ -80,7 +80,7 @@ func removeMemberFromTeam(member OIDCUser) {
 	}
 }
 
-func (t *Team) setTeamApplication(appID uuid.UUID) {
+func (t *Team) setTeamApplication(appID int) {
 	t.ApplicationID = appID
 	db.Save(&t)
 }
@@ -94,7 +94,7 @@ func getAllTeams() []*Team {
 	return teams
 }
 
-func getTeamByID(ID uuid.UUID) *Team {
+func getTeamByID(ID int) *Team {
 	t := &Team{}
 	db.First(&t, ID)
 	t.getTeamMembership()
@@ -162,13 +162,13 @@ func HandleTeamApplicationAssignment(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, "You're not authorized to access this page!")
 		return
 	}
-	id, err := uuid.Parse(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println("Failed while parsing team id", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	appId, err := uuid.Parse(c.PostForm("applicationID"))
+	appId, err := strconv.Atoi(c.PostForm("applicationID"))
 	if err != nil {
 		log.Println("Failed while parsing application id", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

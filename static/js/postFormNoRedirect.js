@@ -14,6 +14,8 @@ function formSubmit(event) {
         // we can use server response to our request now
         console.log(request.response)
         if (200 <= request.status && request.status <= 210) {
+            console.log("hi")
+            form.reset();
             location.reload()
         } else {
             let res = request.responseText;
