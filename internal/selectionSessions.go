@@ -75,6 +75,24 @@ func getAttendingMembers() ([]OIDCUser, int) {
 	return ret, eboard
 }
 
+func getUnassignedAttendees() []OIDCUser {
+	var unassignedMembers []SessionAttendance
+	db.Where("member NOT IN (SELECT member from memberships)").Find(&unassignedMembers)
+	ret := make([]OIDCUser, len(unassignedMembers))
+	for i, member := range unassignedMembers {
+		ret[i] = *oidcClient.GetUserInfo(member.Member)
+		if ret[i].IsEboard() {
+		}
+	}
+	return ret
+}
+
+func tryAddingUnassignedMember(team *Team) {
+	if unass := getUnassignedAttendees(); len(unass) > 0 {
+		team.addMemberToTeam(unass[0])
+	}
+}
+
 func clearSession() bool {
 	if IsSelectionsActive() {
 		log.Println("Selections State was requested to cleared but selections is active. This will not continue.")
@@ -109,7 +127,12 @@ func HandleSessionManagementPage(c *gin.Context) {
 	}
 	attendees, eboard := getAttendingMembers()
 	teams := getAllTeams()
-	c.HTML(http.StatusOK, "sessionManagement.tmpl", templateHeaders(c, map[string]any{"Attendance": attendees, "EBoard": eboard, "Teams": teams}))
+	c.HTML(http.StatusOK, "sessionManagement.tmpl", templateHeaders(c, map[string]any{
+		"Attendance": attendees,
+		"EBoard":     eboard,
+		"Teams":      teams,
+		"Unassigned": getUnassignedAttendees(),
+	}))
 }
 
 // POST functions

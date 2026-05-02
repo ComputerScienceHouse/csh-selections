@@ -174,7 +174,9 @@ func HandleTeamApplicationAssignment(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	getTeamByID(id).setTeamApplication(appId)
+	team := getTeamByID(id)
+	tryAddingUnassignedMember(team)
+	team.setTeamApplication(appId)
 	app := getApplication(appId)
 	app.Assigned = true
 	db.Save(&app)

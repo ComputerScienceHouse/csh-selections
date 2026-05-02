@@ -6,19 +6,17 @@
     STOP{{ else }}>START{{ end }} SESSION
   </button>
 </form>
-{{ if not .SessionState }}
-  <div class="p-2 mt-4">
-    <h3>Add Members to this Selections Session</h3>
-    <form method="post" action="/session/addMembers" onsubmit="formSubmit(event)">
-      <div class="mb-3">
-        <label for="membersSelect" class="control-label">Members</label>
-        <input type="text" name="membersSelect" id="membersSelect" class="form-control"
-               data-module="memberSelect">
-      </div>
-      <button class="btn btn-primary" type="submit">Add Members</button>
-    </form>
-  </div>
-{{ end }}
+<div class="p-2 mt-4">
+  <h3>Add Members to this Selections Session</h3>
+  <form method="post" action="/session/addMembers" onsubmit="formSubmit(event)">
+    <div class="mb-3">
+      <label for="membersSelect" class="control-label">Members</label>
+      <input type="text" name="membersSelect" id="membersSelect" class="form-control"
+             data-module="memberSelect">
+    </div>
+    <button class="btn btn-primary" type="submit">Add Members</button>
+  </form>
+</div>
 {{ if .Attendance }}
   <div class="p-2 mt-4">
     <h3>Members currently selected:</h3>
@@ -43,6 +41,14 @@
           </div>
           <button class="btn btn-primary" type="submit">Create Teams</button>
         </form>
+      {{ else }}
+        <h4 class="mt-4 mb-1">Members In Queue</h4>
+        <p class="my-1">These members will be added one-by-one to teams as they receive new applications.</p>
+        {{ range .Unassigned }}
+          <span class="badge align-items-center p-2 text-body bg-primary-subtle border border-primary-subtle">
+                    {{.FullName}} ({{.Username}})
+          </span>
+        {{ end }}
       {{ end }}
   </div>
 {{ end }}
@@ -105,30 +111,30 @@
 <script>
     function removeMember(username) {
         let request = new XMLHttpRequest();
-        request.open('POST', 'removeMember', true);
-        request.onload = function () { // request successful
+        request.open("POST", "removeMember", true);
+        request.onload = function() { // request successful
             // we can use server response to our request now
             if (200 <= request.status && request.status <= 210) {
-                location.reload()
+                location.reload();
             } else {
-                console.log(request.responseText)
+                console.log(request.responseText);
             }
         };
 
-        request.send(JSON.stringify({'member': username}));
+        request.send(JSON.stringify({ "member": username }));
     }
 
     let confirmed = false;
 
     function submitSessionChange() {
-        let form = document.getElementById('stateForm')
+        let form = document.getElementById("stateForm");
         let request = new XMLHttpRequest();
         request.open(form.method, form.action, true);
-        request.onload = function () { // request successful
+        request.onload = function() { // request successful
             // we can use server response to our request now
-            console.log(request.response)
+            console.log(request.response);
             if (200 <= request.status && request.status <= 210) {
-                location.reload()
+                location.reload();
             } else {
                 console.log(request.responseText);
             }
@@ -138,11 +144,11 @@
     }
 
     function dummyFunc(event) {
-        console.log("hi")
+        console.log("hi");
         if ({{ not .SessionState }}) {
-            formSubmit(event)
+            formSubmit(event);
         } else {
-            event.preventDefault()
+            event.preventDefault();
         }
     }
 </script>
